@@ -11,12 +11,14 @@ import org.springframework.http.converter.messagepack.MessagePackHttpMessageConv
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.samples.travel.config.CommonConfiguration;
 import org.springframework.samples.travel.config.services.ServicesConfiguration;
 import org.springframework.samples.travel.domain.*;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,37 +31,18 @@ import java.util.List;
 @ComponentScan({"org.springframework.samples.travel.rest" })
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
-	private Class[] jaxbClasses = {Hotels.class, Bookings.class, Amenity.class, Booking.class, User.class, Hotel.class};
+	@Inject private CommonConfiguration commonConfiguration ;
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    	// json support
-		MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-		mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-		converters.add(mappingJacksonHttpMessageConverter);
 
-		// jaxb support
-		MarshallingHttpMessageConverter marshallingHttpMessageConverter = new MarshallingHttpMessageConverter(this.marshaller());
-		marshallingHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_XML));
-		converters.add(marshallingHttpMessageConverter);
+		for(HttpMessageConverter<?> mc : commonConfiguration.messageConverters())
+			converters.add(mc);
 
-		// messagepack support
-		MessagePackHttpMessageConverter messagePackHttpMessageConverter = new MessagePackHttpMessageConverter() ;
-		converters.add(messagePackHttpMessageConverter );
-
-	}
-
-	@Bean
-	public Marshaller marshaller() {
-		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		marshaller.setClassesToBeBound(this.jaxbClasses);
-		return marshaller;
 	}
 
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
-
-
 }

@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.messagepack.MessagePackHttpMessageConverter;
 import org.springframework.samples.travel.domain.*;
 import org.springframework.samples.travel.services.BookingService;
 import org.springframework.samples.travel.services.SearchCriteria;
@@ -27,7 +28,7 @@ import java.util.Collection;
 @RequestMapping(value = "/ws/", headers = HotelsRestController.acceptHeader)
 public class HotelsRestController {
 
-	static public final String acceptHeader = "Accept=application/json, application/xml, " ;
+	static public final String acceptHeader = "Accept=application/json, application/xml, " + MessagePackHttpMessageConverter.MEDIA_TYPE_STRING ;
 
 	@Autowired
 	private BookingService bookingService;
@@ -51,7 +52,6 @@ public class HotelsRestController {
 		return this.bookingService.findHotelById(id);
 	}
 
-	// todo whats the right way to handle this? currently its being handled using SPring Webflow on the web tier, the passwords are in the config. we need to make the config share the database jst like th rest of the service code, then make it so that REST clients can login as well.
 	@RequestMapping(value = "/users/login", method = RequestMethod.POST)
 	@ResponseBody
 	public User login(@RequestBody User u) {

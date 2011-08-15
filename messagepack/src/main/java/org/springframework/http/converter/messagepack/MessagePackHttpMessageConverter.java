@@ -38,6 +38,8 @@ public class MessagePackHttpMessageConverter extends AbstractHttpMessageConverte
 
 	private Set<Class<?>> messagePackClasses = new CopyOnWriteArraySet<Class<?>>(); // = new ConcurrentSkipListSet<Class<?>>(new ClassComparator());
 
+	public static final String MEDIA_TYPE_STRING = "application/x-msgpack";
+
 	public static final MediaType MEDIA_TYPE = new MediaType("application", "x-msgpack");
 
 	public MessagePackHttpMessageConverter() {

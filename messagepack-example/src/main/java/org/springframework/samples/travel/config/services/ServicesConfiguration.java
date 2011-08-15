@@ -1,12 +1,12 @@
 package org.springframework.samples.travel.config.services;
 
-import com.gemstone.gemfire.cache.Cache;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -83,12 +83,6 @@ public class ServicesConfiguration {
 	}
 
 
-	@Autowired
-	@Bean(name = "gemfireCacheManager")
-	public CacheManager gemfireCacheManager(  @Qualifier("c") Cache gemfireCache) {
-		org.springframework.data.gemfire.support.GemfireCacheManager cacheManager = new org.springframework.data.gemfire.support.GemfireCacheManager();
-		cacheManager.setCache( gemfireCache);
-		return cacheManager;
-	}
+
 
 }

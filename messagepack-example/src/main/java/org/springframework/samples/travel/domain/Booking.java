@@ -1,8 +1,5 @@
 package org.springframework.samples.travel.domain;
 
-import org.springframework.binding.message.MessageBuilder;
-import org.springframework.binding.message.MessageContext;
-import org.springframework.binding.validation.ValidationContext;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.travel.domain.util.DateFormatXmlAdapter;
 
@@ -212,17 +209,6 @@ public class Booking implements Serializable {
 		this.amenities = amenities;
 	}
 
-	// TODO replace with JSR 303
-	public void validateEnterBookingDetails(ValidationContext context) {
-		MessageContext messages = context.getMessageContext();
-		if (checkinDate.before(today())) {
-			messages.addMessage(new MessageBuilder().error().source(
-					"checkinDate").code("booking.checkinDate.beforeToday")
-					.build());
-		} else if (checkoutDate.before(checkinDate)) {
-			messages.addMessage(new MessageBuilder().error().source("checkoutDate").code("booking.checkoutDate.beforeCheckinDate").build());
-		}
-	}
 
 	private Date today() {
 		Calendar calendar = Calendar.getInstance();

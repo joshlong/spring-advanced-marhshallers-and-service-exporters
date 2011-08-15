@@ -1,6 +1,8 @@
 package org.springframework.samples.travel.domain;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.msgpack.annotation.Ignore;
+import org.msgpack.annotation.Optional;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -123,6 +125,7 @@ public class Hotel implements Serializable {
 
 	@OneToMany(mappedBy = "hotel")
 	@XmlTransient
+	@Ignore
 	@JsonIgnore
 	public Set<Booking> getReservations() {
 		return reservations;
