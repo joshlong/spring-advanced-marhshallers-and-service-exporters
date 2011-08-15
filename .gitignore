@@ -1,0 +1,10 @@
+.DS_Store
+.classpath
+.project
+.settings
+*.ipr
+*.iws
+*.iml
+target
+.dropbox
+

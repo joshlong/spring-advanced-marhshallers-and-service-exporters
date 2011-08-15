@@ -40,16 +40,16 @@ public class MessagePackHttpMessageConverter extends AbstractHttpMessageConverte
 
 	public static final MediaType MEDIA_TYPE = new MediaType("application", "x-msgpack");
 
-	protected MessagePackHttpMessageConverter() {
+	public MessagePackHttpMessageConverter() {
 		super();
 		setSupportedMediaTypes(Arrays.asList(MEDIA_TYPE));
 	}
 
-	protected MessagePackHttpMessageConverter(MediaType supportedMediaType) {
+	public MessagePackHttpMessageConverter(MediaType supportedMediaType) {
 		super(supportedMediaType);
 	}
 
-	protected MessagePackHttpMessageConverter(MediaType... supportedMediaTypes) {
+	public MessagePackHttpMessageConverter(MediaType... supportedMediaTypes) {
 		super(supportedMediaTypes);
 	}
 
