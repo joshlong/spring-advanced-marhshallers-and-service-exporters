@@ -7,9 +7,13 @@ import org.msgpack.rpc.config.ClientConfig;
 import org.msgpack.rpc.dispatcher.MethodDispatcher;
 import org.msgpack.rpc.loop.EventLoop;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * {@link RemoteInvocationBasedExporter} based on the {@link org.msgpack.MessagePack} RPC framework.
@@ -18,16 +22,23 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.remoting.rmi.RmiServiceExporter
  * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
  */
-public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter implements InitializingBean {
+public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
+
+	private volatile boolean running = true;
 
 	private Log log = LogFactory.getLog(getClass());
-
 	private Server server;
 	private ClientConfig clientConfig;
 	private String listenHost = "127.0.0.1";
 	private int listenPort = 1995;
 
+	private InetSocketAddress address ;
+
 	private EventLoop eventLoop;
+
+	public void setAddress(InetSocketAddress address) {
+		this.address = address;
+	}
 
 	public void setHost(String lh) {
 		if (StringUtils.hasText(lh)) {
@@ -45,10 +56,10 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 		this.eventLoop = eventLoop;
 	}
 
+
 	public void setServer(Server server) {
 		this.server = server;
 	}
-
 
 	public void setClientConfig(ClientConfig clientConfig) {
 		this.clientConfig = clientConfig;
@@ -109,9 +120,49 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 		}
 
 		server.serve(dispatcher);
-		server.listen(this.listenHost, this.listenPort);
+		if(this.address !=null ) {
+			server.listen(this.address);
+		}
+		else {
+			server.listen(this.listenHost, this.listenPort);
+		}
 
-		eventLoop.join();
 
+
+	}
+
+	@Override
+	public boolean isAutoStartup() {
+		return true ;
+	}
+
+	@Override
+	public void stop(Runnable callback) {
+	}
+
+	@Override
+	public void start() {
+		try {
+			eventLoop.join();
+		} catch (InterruptedException e) {
+			if(log.isErrorEnabled())
+		    log.debug( e );
+
+		}
+	}
+
+	@Override
+	public void stop() {
+		eventLoop.shutdown();
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public int getPhase() {
+		return 0;
 	}
 }

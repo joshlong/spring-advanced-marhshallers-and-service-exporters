@@ -9,6 +9,7 @@ public class Server {
 
 	private static Log log = LogFactory.getLog(Server.class);
 
+	// both the client and the server need to agree on which host to connect
 	public static String HOST = "127.0.0.1";
 	public static int PORT = 1995;
 
