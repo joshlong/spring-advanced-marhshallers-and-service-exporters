@@ -61,10 +61,6 @@ public class Main {
 		}
 	}
 
-	private static String buildServiceUrl(String prefix) {
-		return "http://localhost:8080" + (prefix.startsWith("/") ? "" : "/") + prefix;
-	}
-
 	public static void main(String[] args) throws Throwable {
 
 		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
@@ -85,6 +81,10 @@ public class Main {
 				return null;
 			}
 		}, mapOfVars);
+	}
+
+	static String buildServiceUrl(String prefix) {
+		return "http://localhost:8080" + (prefix.startsWith("/") ? "" : "/") + prefix;
 	}
 
 	static void debug(String title, HttpHeaders headers) {
