@@ -25,7 +25,7 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 	private Server server;
 	private ClientConfig clientConfig;
 	private String listenHost = "127.0.0.1";
-	private int listenPort = 1985;
+	private int listenPort = 1995;
 
 	private EventLoop eventLoop;
 
@@ -48,6 +48,7 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 	public void setServer(Server server) {
 		this.server = server;
 	}
+
 
 	public void setClientConfig(ClientConfig clientConfig) {
 		this.clientConfig = clientConfig;
