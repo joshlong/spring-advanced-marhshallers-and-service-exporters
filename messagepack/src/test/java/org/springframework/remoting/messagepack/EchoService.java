@@ -5,4 +5,6 @@ package org.springframework.remoting.messagepack;
  */
 public interface EchoService {
 	String  echo(String in);
+
+	Cat fetch();
 }

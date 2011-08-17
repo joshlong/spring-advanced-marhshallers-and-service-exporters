@@ -26,8 +26,13 @@ public class Server {
 			executor.afterPropertiesSet();
 		}
 
+		@Override
+		public Cat fetch() {
+			return new Cat("Garfield",20);
+		}
+
 		/**
-		 * nb: this is not part of the interface, but MessagePack will attempt to call it first, if it's available.
+		 * nb: this is not part of the interface, but MessagePack will attempt to call it if it's available.
 		 * <p/>
 		 * The {@link org.msgpack.rpc.Request} parameter's used to give the callee a chance to handle the request asynchronously or to leverage the error handling mechanism.
 		 *

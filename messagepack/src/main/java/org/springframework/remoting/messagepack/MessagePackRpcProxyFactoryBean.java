@@ -8,6 +8,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteAccessor;
 import org.springframework.util.Assert;
+import org.springframework.util.messagepack.MessagePackUtils;
 
 /**
  * Used to create client side proxies that can communicate with the remote services.
@@ -23,6 +24,16 @@ import org.springframework.util.Assert;
  */
 public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
 
+	public void setExportServiceParameters(boolean exportServiceParameters) {
+		this.exportServiceParameters = exportServiceParameters;
+	}
+
+	public void setSerializeJavaBeanProperties(boolean serializeJavaBeanProperties) {
+		this.serializeJavaBeanProperties = serializeJavaBeanProperties;
+	}
+
+	private boolean exportServiceParameters = true;
+	private boolean serializeJavaBeanProperties = true;
 	private ClientConfig clientConfig;
 	private Client client;
 	private EventLoop eventLoop;
@@ -66,6 +77,10 @@ public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implement
 	@SuppressWarnings("unchecked")
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		if (exportServiceParameters) {
+			MessagePackUtils.registerClassesOnInterface( getServiceInterface(), this.serializeJavaBeanProperties);
+		}
+
 		if (eventLoop == null) {
 			this.eventLoop = new EventLoopFactoryBean().getObject();
 		}
