@@ -1,8 +1,13 @@
 package org.springframework.remoting.messagepack;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.msgpack.rpc.Client;
 import org.msgpack.rpc.config.ClientConfig;
 import org.msgpack.rpc.loop.EventLoop;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,27 +17,20 @@ import org.springframework.util.messagepack.MessagePackUtils;
 
 /**
  * Used to create client side proxies that can communicate with the remote services.
- *
+ * <p/>
  * The interface used on the client does <EM>not</EM> need to match the interface exposed on the server.
- *
- *
- *
  *
  * @author Josh Long
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
  */
-public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
+public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
 
-	public void setExportServiceParameters(boolean exportServiceParameters) {
-		this.exportServiceParameters = exportServiceParameters;
-	}
-
-	public void setSerializeJavaBeanProperties(boolean serializeJavaBeanProperties) {
-		this.serializeJavaBeanProperties = serializeJavaBeanProperties;
-	}
+	private Log log = LogFactory.getLog(getClass());
+	private boolean remapResults = true;
 
 	private boolean exportServiceParameters = true;
+
 	private boolean serializeJavaBeanProperties = true;
 	private ClientConfig clientConfig;
 	private Client client;
@@ -74,11 +72,28 @@ public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implement
 		return false;
 	}
 
+	/**
+	 * When {@link org.msgpack.MessagePack} sends back the object graph, it comes in as the first level object,
+	 * then any relationships come in as collections of {@link org.msgpack.MessagePackObject}, not the original type.
+	 * <p/>
+	 * Well, using some heuristics (specifically, w.r.t. to generics), we can automatically remap these results onto your domain
+	 * POJOs for you, transparently, before you get the results.
+	 */
+	private class ObjectGraphRepairingMethodInterceptor implements MethodInterceptor {
+		@Override
+		public Object invoke(MethodInvocation invocation) throws Throwable {
+			if (log.isDebugEnabled()) {
+				log.debug("the client called: " + invocation.getMethod().toGenericString());
+			}
+			return MessagePackUtils.remapResultObject(invocation.proceed());
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (exportServiceParameters) {
- 		MessagePackUtils.findAndRegisterAllClassesRelatedToClass(getServiceInterface(), this.serializeJavaBeanProperties);
+			MessagePackUtils.findAndRegisterAllClassesRelatedToClass(getServiceInterface(), this.serializeJavaBeanProperties);
 		}
 
 		if (eventLoop == null) {
@@ -90,12 +105,33 @@ public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implement
 			client = new Client(this.host, this.port, this.eventLoop);
 		}
 
-		Assert.notNull(this.client,  "the client can't be null");
+		Assert.notNull(this.client, "the client can't be null");
 		Assert.notNull(this.host, "the host can't be null");
 
-	    proxy = (T) client.proxy(getServiceInterface());
+		proxy = (T) client.proxy(getServiceInterface());
 
-		Assert.notNull(this.proxy,  "the proxy can't be null");
+		if (remapResults) {
+			ProxyFactory factory = new ProxyFactory(proxy);
+			factory.addInterface(getServiceInterface());
+			factory.addAdvice(new ObjectGraphRepairingMethodInterceptor());
+			this.proxy = (T) factory.getProxy(getBeanClassLoader());
+		}
+
+		Assert.notNull(this.proxy, "the proxy can't be null");
 
 	}
+
+
+	public void setRemapResults(boolean remapResults) {
+		this.remapResults = remapResults;
+	}
+
+	public void setExportServiceParameters(boolean exportServiceParameters) {
+		this.exportServiceParameters = exportServiceParameters;
+	}
+
+	public void setSerializeJavaBeanProperties(boolean serializeJavaBeanProperties) {
+		this.serializeJavaBeanProperties = serializeJavaBeanProperties;
+	}
+
 }

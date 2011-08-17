@@ -14,6 +14,9 @@ public class Human {
 		this.name = name;
 	}
 
+    public Human() {
+	}
+
 	public Human(String name) {
 		this.name = name;
 	}

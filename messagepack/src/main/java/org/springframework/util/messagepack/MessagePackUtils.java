@@ -9,7 +9,6 @@ import org.msgpack.Template;
 import org.msgpack.template.builder.BeansTemplateBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -64,9 +63,15 @@ public abstract class MessagePackUtils {
 	/**
 	 * this shoud ideally do something smart like recursively walk the object tree, but for now let's worry about top level stuff ....
 	 */
-	public static <T> void expandResultIntoExpectedObjectGraph(Class<T> clzz, T result) throws Throwable {
-		Assert.isInstanceOf(clzz, result);
-		PropertyDescriptor descriptor[] = BeanUtils.getPropertyDescriptors(clzz);
+	public static <T> void expandResultIntoExpectedObjectGraph(T result) throws Throwable {
+		Class<?> clazzOfT = result.getClass();
+
+		if (isUninterestingClass(clazzOfT)) {
+			return;
+		}
+
+
+		PropertyDescriptor descriptor[] = BeanUtils.getPropertyDescriptors(clazzOfT);
 		for (PropertyDescriptor pd : descriptor) {
 			Method readMethod = pd.getReadMethod();
 			Method writeMethod = pd.getWriteMethod();
@@ -87,18 +92,26 @@ public abstract class MessagePackUtils {
 		}
 	}
 
-	public static void registerClass(Class<?> clazz, boolean serializeJavaBeanProperties) {
+	private static boolean isUninterestingClass(Class<?> clazz) {
 		String javaPackage = "java";
 		String messagePackPackage = MessagePack.class.getPackage().getName();
 		String clazzName = clazz.getName();
-		if (!clazzName.startsWith(javaPackage) && !clazzName.startsWith(messagePackPackage) &&
-				    !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() && !clazzName.startsWith(MessagePack.class.getPackage().getName())) {
-			if (serializeJavaBeanProperties) {
-				Template template = beansTemplateBuilder.buildTemplate(clazz);
-				MessagePack.register(clazz, template);
-			} else {
-				MessagePack.register(clazz);
-			}
+		return !(!clazzName.startsWith(javaPackage) && !clazzName.startsWith(messagePackPackage) &&
+				 !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() &&
+				 !clazzName.startsWith(MessagePack.class.getPackage().getName()));
+	}
+
+	public static void registerClass(Class<?> clazz, boolean serializeJavaBeanProperties) {
+
+		if (isUninterestingClass(clazz)) {
+			return;
+		}
+
+		if (serializeJavaBeanProperties) {
+			Template template = beansTemplateBuilder.buildTemplate(clazz);
+			MessagePack.register(clazz, template);
+		} else {
+			MessagePack.register(clazz);
 		}
 	}
 
@@ -111,19 +124,20 @@ public abstract class MessagePackUtils {
 	 * @param serialize whether or not the JavaBean types should be serialized using javabeans conventions or the public class property.
 	 */
 	public static void findAndRegisterAllClassesRelatedToClass(final Class<?> clzz, final boolean serialize) {
-
-
-			MessagePackReflectionUtils.crawlJavaBeanObjectGraph(clzz, new MessagePackReflectionUtils.ClassTraversalCallback() {
-				@Override
-				public void doWithClass(Class<?> foundClass) {
-					if (log.isDebugEnabled()) {
-						log.debug("found " + foundClass.getName() + ".");
-					}
-					MessagePackUtils.registerClass(foundClass, serialize);
+		MessagePackReflectionUtils.crawlJavaBeanObjectGraph(clzz, new MessagePackReflectionUtils.ClassTraversalCallback() {
+			@Override
+			public void doWithClass(Class<?> foundClass) {
+				if (log.isDebugEnabled()) {
+					log.debug("found " + foundClass.getName() + ".");
 				}
-			});
+				MessagePackUtils.registerClass(foundClass, serialize);
+			}
+		});
+	}
 
-
+	public static Object remapResultObject(Object object) throws Throwable {
+		expandResultIntoExpectedObjectGraph(object);
+		return object;
 	}
 
 
