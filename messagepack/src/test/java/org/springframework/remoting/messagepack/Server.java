@@ -28,7 +28,13 @@ public class Server {
 
 		@Override
 		public Cat fetch() {
-			return new Cat("Garfield",20);
+
+			Cat garfield = new Cat("Garfield", (int)(Math.random()  * 100));
+			Cat nermel = new Cat("Nermel",12);
+			Cat george = new Cat("George",42);
+			garfield.addFriend(nermel);
+			garfield.addFriend(george);
+			return garfield ;
 		}
 
 		/**
