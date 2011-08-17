@@ -63,13 +63,12 @@ public abstract class MessagePackUtils {
 	/**
 	 * this shoud ideally do something smart like recursively walk the object tree, but for now let's worry about top level stuff ....
 	 */
-	public static <T> void expandResultIntoExpectedObjectGraph(T result) throws Throwable {
+	public static <T> T remapResult(T result) throws Throwable {
 		Class<?> clazzOfT = result.getClass();
 
-		if (isUninterestingClass(clazzOfT)) {
-			return;
+		if (ReflectionUtils.isUninterestingClass(clazzOfT)) {
+			return result;
 		}
-
 
 		PropertyDescriptor descriptor[] = BeanUtils.getPropertyDescriptors(clazzOfT);
 		for (PropertyDescriptor pd : descriptor) {
@@ -80,7 +79,7 @@ public abstract class MessagePackUtils {
 				// do nothing
 			} else if (Collection.class.isAssignableFrom(readerReturnClazz)) {
 				Collection values = (Collection) readMethod.invoke(result);
-				Class[] genericClasses = MessagePackReflectionUtils.getGenericTypesForReturnValue(readMethod);
+				Class[] genericClasses = TypeUtils.getGenericTypesForReturnValue(readMethod);
 				Collection destination = buildReplacementCollectionForOriginalProperty(values);
 				for (Object srcObject : values) {
 					destination.add(convertMessagePackObject(srcObject, genericClasses[0]));
@@ -90,20 +89,14 @@ public abstract class MessagePackUtils {
 				// its a generic object in the type registry somewhere
 			}
 		}
+
+		return result ;
 	}
 
-	private static boolean isUninterestingClass(Class<?> clazz) {
-		String javaPackage = "java";
-		String messagePackPackage = MessagePack.class.getPackage().getName();
-		String clazzName = clazz.getName();
-		return !(!clazzName.startsWith(javaPackage) && !clazzName.startsWith(messagePackPackage) &&
-				 !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() &&
-				 !clazzName.startsWith(MessagePack.class.getPackage().getName()));
-	}
 
 	public static void registerClass(Class<?> clazz, boolean serializeJavaBeanProperties) {
 
-		if (isUninterestingClass(clazz)) {
+		if (ReflectionUtils.isUninterestingClass(clazz)) {
 			return;
 		}
 
@@ -124,7 +117,7 @@ public abstract class MessagePackUtils {
 	 * @param serialize whether or not the JavaBean types should be serialized using javabeans conventions or the public class property.
 	 */
 	public static void findAndRegisterAllClassesRelatedToClass(final Class<?> clzz, final boolean serialize) {
-		MessagePackReflectionUtils.crawlJavaBeanObjectGraph(clzz, new MessagePackReflectionUtils.ClassTraversalCallback() {
+		ReflectionUtils.crawlJavaBeanObjectGraph(clzz, new ReflectionUtils.ClassTraversalCallback() {
 			@Override
 			public void doWithClass(Class<?> foundClass) {
 				if (log.isDebugEnabled()) {
@@ -135,10 +128,6 @@ public abstract class MessagePackUtils {
 		});
 	}
 
-	public static Object remapResultObject(Object object) throws Throwable {
-		expandResultIntoExpectedObjectGraph(object);
-		return object;
-	}
 
 
 }

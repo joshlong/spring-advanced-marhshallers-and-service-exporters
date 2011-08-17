@@ -85,7 +85,7 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 			if (log.isDebugEnabled()) {
 				log.debug("the client called: " + invocation.getMethod().toGenericString());
 			}
-			return MessagePackUtils.remapResultObject(invocation.proceed());
+			return MessagePackUtils.remapResult(invocation.proceed());
 		}
 	}
 
@@ -108,14 +108,15 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 		Assert.notNull(this.client, "the client can't be null");
 		Assert.notNull(this.host, "the host can't be null");
 
-		proxy = (T) client.proxy(getServiceInterface());
+		Object p =   client.proxy(getServiceInterface());
 
 		if (remapResults) {
-			ProxyFactory factory = new ProxyFactory(proxy);
+			ProxyFactory factory = new ProxyFactory(p);
 			factory.addInterface(getServiceInterface());
 			factory.addAdvice(new ObjectGraphRepairingMethodInterceptor());
-			this.proxy = (T) factory.getProxy(getBeanClassLoader());
+			p = (T) factory.getProxy(getBeanClassLoader());
 		}
+		this.proxy = (T) p ;
 
 		Assert.notNull(this.proxy, "the proxy can't be null");
 
