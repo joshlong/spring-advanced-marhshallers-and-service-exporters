@@ -9,19 +9,18 @@ import java.util.Set;
  * Dummy entity with state to test RPC withc complex objects
  */
 public class Cat {
-	private String name ;
-	private int age ;
-	private Set <Cat> friends = new HashSet <Cat> ();
+	public String name ;
+	public int age ;
+	public Set <Cat> friends = new HashSet <Cat> ();
 
-	public Cat getBrother() {
-		return brother;
+	/* todo 1:1 objects don't seem to work, but collections, oddly, do.
+	public Human getCustodian() {
+		return custodian;
 	}
 
-	public void setBrother(Cat brother) {
-		this.brother = brother;
-	}
-
-	private Cat brother ;
+	public void setCustodian(Human custodian) {
+		this.custodian = custodian;
+	}*/
 
 	public Set<Cat> getFriends() {
 		return friends;
@@ -61,9 +60,9 @@ public class Cat {
 
 	public String toString(){
 		return new ToStringCreator(this)
-				       .append("friends", this.getFriends())
-				       .append("name", this.getName())
-				       .append("age", this.getAge())
-				       .toString();
+				        .append("friends", this.getFriends())
+				        .append("name", this.getName())
+				        .append("age", this.getAge())
+				        .toString();
 	}
 }

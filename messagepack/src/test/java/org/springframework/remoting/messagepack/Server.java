@@ -7,6 +7,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.messagepack.MessagePackUtils;
 
 public class Server {
 
@@ -34,6 +35,7 @@ public class Server {
 			Cat george = new Cat("George",42);
 			garfield.addFriend(nermel);
 			garfield.addFriend(george);
+
 			return garfield ;
 		}
 
