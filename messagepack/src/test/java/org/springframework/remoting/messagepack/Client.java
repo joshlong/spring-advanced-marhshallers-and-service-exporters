@@ -1,34 +1,40 @@
 package org.springframework.remoting.messagepack;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.msgpack.MessagePackObject;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.Future;
 
 public class Client {
 
-	private static Log log = LogFactory.getLog(Client.class);
+	public static interface ClientService extends EchoService {
+		Future<MessagePackObject> hello(String name);
+	}
 
-	static public void main(String[] a) throws Throwable {
+	@Configuration
+	static class ClientConfiguration {
 
-		try {
-			MessagePackRpcProxyFactoryBean client = new MessagePackRpcProxyFactoryBean();
-			client.setServiceInterface(Server.EchoService.class);
-			client.setHost(Server.HOST);
-			client.setPort(Server.PORT);
-			client.setBeanClassLoader(ClassLoader.getSystemClassLoader());
-			client.afterPropertiesSet();
-
-			Object object = client.getObject();
-
-			Server.EchoService myService = (Server.EchoService) object;
-
-			if (log.isInfoEnabled()) {
-				log.info(myService.hello("Josh"));
-			}
-
-		} catch (Throwable throwable) {
-			if (log.isErrorEnabled()) {
-				log.error("there's an error", throwable);
-			}
+		@Bean
+		public MessagePackRpcProxyFactoryBean<ClientService> clientService() {
+			MessagePackRpcProxyFactoryBean<ClientService> svc = new MessagePackRpcProxyFactoryBean<ClientService>();
+			svc.setServiceInterface(ClientService.class);
+			svc.setPort(Server.PORT);
+			svc.setHost(Server.HOST);
+			return svc;
 		}
+	}
+
+
+	public static void main(String args[]) throws Throwable {
+		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
+		ClientService client = annotationConfigApplicationContext.getBean(ClientService.class);
+
+		String echoResponse = client.echo("You're stupid.");
+		System.out.println("Calling EchoService#echo(String) " + echoResponse);
+
+		Future<MessagePackObject> helloResponse = client.hello("Josh");
+		System.out.println("Calling EchoService#hello(String) " + helloResponse.get().asString());
 	}
 }

@@ -10,17 +10,24 @@ import org.springframework.remoting.support.RemoteAccessor;
 import org.springframework.util.Assert;
 
 /**
+ * Used to create client side proxies that can communicate with the remote services.
+ *
+ * The interface used on the client does <EM>not</EM> need to match the interface exposed on the server.
+ *
+ *
+ *
+ *
  * @author Josh Long
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
  */
-public class MessagePackRpcProxyFactoryBean extends RemoteAccessor implements FactoryBean<Object>, BeanClassLoaderAware, InitializingBean {
+public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
 
 	private ClientConfig clientConfig;
 	private Client client;
 	private EventLoop eventLoop;
-	private Object proxy;
-	private String host;
+	private T proxy;
+	private String host = "127.0.0.1";
 	private ClassLoader classLoader;
 	private int port = 1995;
 
@@ -42,7 +49,7 @@ public class MessagePackRpcProxyFactoryBean extends RemoteAccessor implements Fa
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public T getObject() throws Exception {
 		return this.proxy;
 	}
 
@@ -60,7 +67,7 @@ public class MessagePackRpcProxyFactoryBean extends RemoteAccessor implements Fa
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (eventLoop == null) {
-			this.eventLoop = EventLoop.defaultEventLoop();
+			this.eventLoop = new EventLoopFactoryBean().getObject();
 		}
 		if (clientConfig != null) {
 			client = new Client(this.host, this.port, this.clientConfig, this.eventLoop);
@@ -69,9 +76,11 @@ public class MessagePackRpcProxyFactoryBean extends RemoteAccessor implements Fa
 		}
 
 		Assert.notNull(this.client,  "the client can't be null");
-		Assert.notNull(this.host, "the HOST can't be null");
+		Assert.notNull(this.host, "the host can't be null");
 
-	    proxy = client.proxy(getServiceInterface());
+	    proxy = (T) client.proxy(getServiceInterface());
+
 		Assert.notNull(this.proxy,  "the proxy can't be null");
+
 	}
 }
