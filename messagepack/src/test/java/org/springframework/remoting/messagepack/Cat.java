@@ -9,18 +9,23 @@ import java.util.Set;
  * Dummy entity with state to test RPC withc complex objects
  */
 public class Cat {
-	public String name ;
-	public int age ;
-	public Set <Cat> friends = new HashSet <Cat> ();
 
-	/* todo 1:1 objects don't seem to work, but collections, oddly, do.
-	public Human getCustodian() {
-		return custodian;
+	private Set<Human> humans = new HashSet<Human>();
+	public Set<Cat> friends = new HashSet<Cat>();
+	public String name;
+	public int age;
+
+	public void addHuman(Human human) {
+		this.humans.add(human);
 	}
 
-	public void setCustodian(Human custodian) {
-		this.custodian = custodian;
-	}*/
+	public Set<Human> getHumans() {
+		return humans;
+	}
+
+	public void setHumans(Set<Human> humans) {
+		this.humans = humans;
+	}
 
 	public Set<Cat> getFriends() {
 		return friends;
@@ -30,8 +35,8 @@ public class Cat {
 		this.friends = friends;
 	}
 
-	public void addFriend(Cat c){
-		this.friends .add(c) ;
+	public void addFriend(Cat c) {
+		this.friends.add(c);
 	}
 
 	public Cat(String name, int age) {
@@ -58,11 +63,12 @@ public class Cat {
 		this.age = age;
 	}
 
-	public String toString(){
+	public String toString() {
 		return new ToStringCreator(this)
-				        .append("friends", this.getFriends())
-				        .append("name", this.getName())
-				        .append("age", this.getAge())
-				        .toString();
+				       .append("friends", this.getFriends())
+				       .append("name", this.getName())
+				       .append("age", this.getAge())
+				       .append("humans", this.getHumans())
+				       .toString();
 	}
 }

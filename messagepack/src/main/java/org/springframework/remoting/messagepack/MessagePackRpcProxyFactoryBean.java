@@ -78,7 +78,7 @@ public class MessagePackRpcProxyFactoryBean <T> extends RemoteAccessor implement
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (exportServiceParameters) {
-			MessagePackUtils.registerClassesOnInterface( getServiceInterface(), this.serializeJavaBeanProperties);
+ 		MessagePackUtils.findAndRegisterAllClassesRelatedToClass(getServiceInterface(), this.serializeJavaBeanProperties);
 		}
 
 		if (eventLoop == null) {

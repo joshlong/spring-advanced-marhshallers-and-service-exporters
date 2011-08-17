@@ -18,6 +18,10 @@ import java.net.InetSocketAddress;
 /**
  * {@link RemoteInvocationBasedExporter} based on the {@link org.msgpack.MessagePack} RPC framework.
  *
+ * TODO set a list of classes that you want to the exporter to automatically register. Perhaps useful when you don't want the exporter to crawl your class tree.
+ *
+ *
+ *
  * @author Josh Long
  * @see org.springframework.remoting.rmi.RmiServiceExporter
  * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
@@ -96,7 +100,7 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 		Class<?> serviceInterface = getServiceInterface();
 
 		if (exportServiceParameters) {
-			MessagePackUtils.registerClassesOnInterface(service,this.serializeJavaBeanProperties);
+ 		MessagePackUtils.findAndRegisterAllClassesRelatedToClass(service.getClass(), this.serializeJavaBeanProperties);
 		}
 
 		Assert.notNull(service, "the service target can NOT be null!");

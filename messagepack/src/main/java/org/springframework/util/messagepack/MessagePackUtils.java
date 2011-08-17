@@ -21,9 +21,11 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public abstract class MessagePackUtils {
 
-	static private Log log = LogFactory.getLog(MessagePackUtils.class);
+//	static private Log log = LogFactory.getLog(MessagePackUtils.class);
 
 	private static final BeansTemplateBuilder beansTemplateBuilder = new BeansTemplateBuilder();
+
+	private static final Log log = LogFactory.getLog(MessagePackUtils.class.getName());
 
 	private static <T> Collection<T> buildReplacementCollectionForOriginalProperty(Collection<T> in) throws Throwable {
 
@@ -44,17 +46,18 @@ public abstract class MessagePackUtils {
 			return in.getClass().newInstance();
 		}
 
+		// it's impossible to get here, right?
 		Assert.isInstanceOf(Collection.class, in, "this is not a known Collection");
 
-		return null ;
+		return null;
 	}
 
-	private static Object convertMessagePackObject(Object input , Class<?> clzz ){
-		if(input instanceof MessagePackObject){
+	private static Object convertMessagePackObject(Object input, Class<?> clzz) {
+		if (input instanceof MessagePackObject) {
 			MessagePackObject messagePackObject = (MessagePackObject) input;
-			return messagePackObject.convert( clzz);
+			return messagePackObject.convert(clzz);
 		}
-		return null ;
+		return null;
 	}
 
 
@@ -68,22 +71,16 @@ public abstract class MessagePackUtils {
 			Method readMethod = pd.getReadMethod();
 			Method writeMethod = pd.getWriteMethod();
 			Class<?> readerReturnClazz = readMethod.getReturnType();
-			if(readerReturnClazz.isPrimitive()||MessagePackObject.class.isAssignableFrom(readerReturnClazz)){
+			if (readerReturnClazz.isPrimitive() || MessagePackObject.class.isAssignableFrom(readerReturnClazz)) {
 				// do nothing
 			} else if (Collection.class.isAssignableFrom(readerReturnClazz)) {
 				Collection values = (Collection) readMethod.invoke(result);
 				Class[] genericClasses = MessagePackReflectionUtils.getGenericTypesForReturnValue(readMethod);
 				Collection destination = buildReplacementCollectionForOriginalProperty(values);
-				for(Object srcObject : values){
-					destination.add(convertMessagePackObject(srcObject,  genericClasses[0]));
+				for (Object srcObject : values) {
+					destination.add(convertMessagePackObject(srcObject, genericClasses[0]));
 				}
-				// recurse
-				/*for( Object o : destination){
-				  expandResultIntoExpectedObjectGraph( genericClasses[0], o  );
-				}*/
-
-				writeMethod.invoke(result ,destination);
-
+				writeMethod.invoke(result, destination);
 			} else {
 				// its a generic object in the type registry somewhere
 			}
@@ -91,10 +88,11 @@ public abstract class MessagePackUtils {
 	}
 
 	public static void registerClass(Class<?> clazz, boolean serializeJavaBeanProperties) {
-		String javaLangPackage = String.class.getPackage().getName();
+		String javaPackage = "java";
 		String messagePackPackage = MessagePack.class.getPackage().getName();
 		String clazzName = clazz.getName();
-		if (!clazzName.startsWith(javaLangPackage) && !clazzName.startsWith(messagePackPackage) && !clazz.isInterface() && !clazz.isPrimitive()) {
+		if (!clazzName.startsWith(javaPackage) && !clazzName.startsWith(messagePackPackage) &&
+				    !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() && !clazzName.startsWith(MessagePack.class.getPackage().getName())) {
 			if (serializeJavaBeanProperties) {
 				Template template = beansTemplateBuilder.buildTemplate(clazz);
 				MessagePack.register(clazz, template);
@@ -104,24 +102,29 @@ public abstract class MessagePackUtils {
 		}
 	}
 
-	public static void registerClassesOnInterface(Class<?> clzz, boolean serialize) {
-		final Set<Class<?>> classSet = new HashSet<Class<?>>();
+	/**
+	 * Scans a given class and looks at all methods, return parameters, etc., and automatically registers them.
+	 * First, this does not (for obvious reasons) register primitives, or JDK classes, or even java.util.* classes, since
+	 * there's no possible use case for those and since - in the common case - the serialization already supports them, anyway.
+	 *
+	 * @param clzz      the interface to scan for types
+	 * @param serialize whether or not the JavaBean types should be serialized using javabeans conventions or the public class property.
+	 */
+	public static void findAndRegisterAllClassesRelatedToClass(final Class<?> clzz, final boolean serialize) {
 
-		ReflectionUtils.doWithMethods(clzz, new ReflectionUtils.MethodCallback() {
-			@Override
-			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-				Collections.addAll(classSet, method.getParameterTypes());
-				Collections.addAll(classSet, (Class<?>) method.getReturnType());
-			}
-		});
 
-		for (Class<?> clazz : classSet) {
-			registerClass(clazz, serialize);
-		}
+			MessagePackReflectionUtils.crawlJavaBeanObjectGraph(clzz, new MessagePackReflectionUtils.ClassTraversalCallback() {
+				@Override
+				public void doWithClass(Class<?> foundClass) {
+					if (log.isDebugEnabled()) {
+						log.debug("found " + foundClass.getName() + ".");
+					}
+					MessagePackUtils.registerClass(foundClass, serialize);
+				}
+			});
+
+
 	}
 
-	public static void registerClassesOnInterface(Object targetService, boolean serializeJavaBeanProperties) throws Exception {
-		Class<?> clzz = targetService.getClass();
-		registerClassesOnInterface(clzz, serializeJavaBeanProperties);
-	}
+
 }
