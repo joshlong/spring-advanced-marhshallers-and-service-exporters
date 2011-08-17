@@ -4,6 +4,7 @@ import org.msgpack.MessagePackObject;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.messagepack.MessagePackReflectionUtils;
 import org.springframework.util.messagepack.MessagePackUtils;
 
 import java.util.concurrent.Future;
@@ -29,6 +30,15 @@ public class Client {
 
 	public static void main(String args[]) throws Throwable {
 
+        Cat cat = new Cat();
+
+        MessagePackReflectionUtils.crawlJavaBeanObjectGraph( cat, new MessagePackReflectionUtils.ClassTraversalCallback() {
+            @Override
+            public void doWithClass(Class<?> o) {
+                 System.out.println( "class: "+o);
+            }
+        });
+/*
 
 		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
 		ClientService client = annotationConfigApplicationContext.getBean(ClientService.class);
@@ -47,5 +57,6 @@ public class Client {
 		System.out.println("Calling EchoService#hello(String) " + helloResponse.get().asString());
 
 
+ */
 	}
 }

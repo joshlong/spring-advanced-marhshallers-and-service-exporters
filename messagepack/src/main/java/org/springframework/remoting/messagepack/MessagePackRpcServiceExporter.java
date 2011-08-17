@@ -10,15 +10,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.messagepack.MessagePackUtils;
 
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * {@link RemoteInvocationBasedExporter} based on the {@link org.msgpack.MessagePack} RPC framework.
