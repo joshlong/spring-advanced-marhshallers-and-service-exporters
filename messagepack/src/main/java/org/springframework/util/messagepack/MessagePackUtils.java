@@ -1,6 +1,5 @@
 package org.springframework.util.messagepack;
 
-import com.sun.jmx.remote.internal.ArrayQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.msgpack.MessagePack;
@@ -13,6 +12,7 @@ import org.springframework.util.Assert;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * @author Josh Long
@@ -38,7 +38,7 @@ public abstract class MessagePackUtils {
 				return new ArrayList<T>(size);
 			}
 			if (in.getClass().equals(Queue.class)) {
-				return new ArrayQueue<T>(size);
+				return new ArrayBlockingQueue<T>(size);
 			}
 
 		} else {
@@ -70,6 +70,8 @@ public abstract class MessagePackUtils {
 			return result;
 		}
 
+		// there are a couple of things that this method can do
+		// reconstitute weird ass result objects themselves
 		PropertyDescriptor descriptor[] = BeanUtils.getPropertyDescriptors(clazzOfT);
 		for (PropertyDescriptor pd : descriptor) {
 			Method readMethod = pd.getReadMethod();

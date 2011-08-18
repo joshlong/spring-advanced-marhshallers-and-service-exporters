@@ -5,7 +5,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.msgpack.MessagePackObject;
 import org.msgpack.object.RawType;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,9 @@ public class MessagePackServiceExporterTest {
 	public static int PORT = 1995;
 
 	public static interface ClientService extends EchoService, CatService {
-		Future<MessagePackObject> hello(String name);
+		Future<String> hello(String name);
+
+		Future<Cat> fetchCat();
 
 	}
 
@@ -54,8 +55,7 @@ public class MessagePackServiceExporterTest {
 
 		@Bean
 		public EventLoopFactoryBean eventLoopFactoryBean() throws Exception {
-			EventLoopFactoryBean bean = new EventLoopFactoryBean();
-			return bean;
+			return new EventLoopFactoryBean();
 		}
 
 		@Bean
@@ -93,6 +93,35 @@ public class MessagePackServiceExporterTest {
 		serverContext.stop();
 	}
 
+
+	@Test
+	public void testFutureWorks() throws Throwable {
+
+		Future<Cat> resultCat = rpcClient.fetchCat();
+
+		Cat cat = resultCat.get();
+
+		Assert.assertNotNull(cat);
+
+
+		Future<String> futureResponse = rpcClient.hello("Josh");
+		Assert.assertNotNull("the response can't be null", futureResponse);
+		String messagePackObject = futureResponse.get();
+		Assert.assertNotNull(messagePackObject != null);
+		String helloMsg = "Josh";
+
+		ResponseArgumentCapturingRequest request = new ResponseArgumentCapturingRequest("hello", RawType.create(helloMsg));
+		defaultEchoService.hello(request, helloMsg);
+
+		Object resultOfRpcCall = rpcClient.hello(helloMsg).get();
+
+		Assert.assertEquals("the response sent from the service is indeed the " +
+				                    "same one as the one we received as client, binding to a" +
+				                    " different service interface.", request.getResult(), resultOfRpcCall);
+
+
+	}
+
 	@Test
 	public void testRetrievingFlatObject() throws Throwable {
 
@@ -116,27 +145,8 @@ public class MessagePackServiceExporterTest {
 		Assert.assertEquals(rpcClient.alarm(arg), defaultEchoService.alarm(arg));
 	}
 
-
 	@Test
-	public void testFutureWorks() throws Throwable {
-		Future<MessagePackObject> futureResponse = rpcClient.hello("Josh");
-		Assert.assertNotNull("the response can't be null", futureResponse);
-		MessagePackObject messagePackObject = futureResponse.get();
-		Assert.assertNotNull(messagePackObject != null);
-		String helloMsg = "Josh";
-
-		ResponseArgumentCapturingRequest request = new ResponseArgumentCapturingRequest("hello", RawType.create(helloMsg));
-		defaultEchoService.hello(request, helloMsg);
-
-		Object resultOfRpcCall = rpcClient.hello(helloMsg).get().asString();
-
-		Assert.assertEquals("the response sent from the service is indeed the " +
-				                    "same one as the one we received as client, binding to a" +
-				                    " different service interface.", request.getResult(), resultOfRpcCall);
-	}
-
-	@Test
-	public void testRetreivingCollections() throws Throwable {
+	public void testRetrievingCollections() throws Throwable {
 
 
 		Cat rpcCat = rpcClient.fetch();
@@ -144,7 +154,6 @@ public class MessagePackServiceExporterTest {
 
 		Assert.assertEquals(localCat.getFriends().size(), rpcCat.getFriends().size());
 		Assert.assertEquals(localCat.getHumans().size(), rpcCat.getHumans().size());
-
 
 		Set<Cat> localFriends = localCat.getFriends();
 		Set<Cat> remoteFriends = rpcCat.getFriends();
