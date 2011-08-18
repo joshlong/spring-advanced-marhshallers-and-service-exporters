@@ -5,7 +5,7 @@ import org.msgpack.MessagePackObject;
 import org.msgpack.rpc.Request;
 import org.msgpack.rpc.transport.MessageSendable;
 
-public class ResponseArgumentCapturingRequest extends Request  {
+public class ResponseArgumentCapturingRequest extends Request {
 	public ResponseArgumentCapturingRequest(MessageSendable channel, int msgid, String method, MessagePackObject args) {
 		super(channel, msgid, method, args);
 	}
@@ -15,10 +15,11 @@ public class ResponseArgumentCapturingRequest extends Request  {
 	}
 
 	private Object result;
+
 	@Override
 	public void sendResult(Object result) {
-		this.result = result ;
-        super.sendResult(result);
+		this.result = result;
+		super.sendResult(result);
 	}
 
 	public Object getResult() {

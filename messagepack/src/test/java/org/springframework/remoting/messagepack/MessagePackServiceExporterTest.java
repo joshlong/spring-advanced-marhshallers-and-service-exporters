@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.msgpack.MessagePackObject;
 import org.msgpack.object.RawType;
-import org.msgpack.rpc.Request;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MessagePackServiceExporterTest {
 
@@ -26,7 +24,7 @@ public class MessagePackServiceExporterTest {
 	public static String HOST = "127.0.0.1";
 	public static int PORT = 1995;
 
-	public static interface ClientService extends EchoService  ,CatService {
+	public static interface ClientService extends EchoService, CatService {
 		Future<MessagePackObject> hello(String name);
 
 	}
@@ -37,8 +35,8 @@ public class MessagePackServiceExporterTest {
 		public MessagePackRpcProxyFactoryBean<ClientService> clientService() {
 			MessagePackRpcProxyFactoryBean<ClientService> svc = new MessagePackRpcProxyFactoryBean<ClientService>();
 			svc.setServiceInterface(ClientService.class);
-			svc.setPort( PORT);
-			svc.setHost( HOST);
+			svc.setPort(PORT);
+			svc.setHost(HOST);
 			return svc;
 		}
 
@@ -54,18 +52,19 @@ public class MessagePackServiceExporterTest {
 		}
 
 
-
-		@Bean public EventLoopFactoryBean eventLoopFactoryBean()throws Exception {
+		@Bean
+		public EventLoopFactoryBean eventLoopFactoryBean() throws Exception {
 			EventLoopFactoryBean bean = new EventLoopFactoryBean();
-			return bean ;
+			return bean;
 		}
+
 		@Bean
 		public MessagePackRpcServiceExporter helloService() throws Exception {
 			MessagePackRpcServiceExporter exporter = new MessagePackRpcServiceExporter();
 			exporter.setHost(HOST);
 			exporter.setPort(PORT);
 			exporter.setService(service());
-			exporter.setEventLoop( eventLoopFactoryBean().getObject());
+			exporter.setEventLoop(eventLoopFactoryBean().getObject());
 			return exporter;
 		}
 
@@ -84,7 +83,7 @@ public class MessagePackServiceExporterTest {
 		Assert.assertNotNull("the echoService can't be null", rpcClient);
 
 		ExecutorService ex = Executors.newCachedThreadPool();
-		defaultEchoService.setExecutor( ex );
+		defaultEchoService.setExecutor(ex);
 
 	}
 
@@ -118,23 +117,22 @@ public class MessagePackServiceExporterTest {
 	}
 
 
-
 	@Test
-	public void testFutureWorks () throws Throwable {
-		Future<MessagePackObject > futureResponse = rpcClient.hello("Josh") ;
-		Assert.assertNotNull("the response can't be null" ,futureResponse);
-		MessagePackObject messagePackObject = futureResponse.get() ;
-		Assert.assertNotNull(messagePackObject != null ) ;
+	public void testFutureWorks() throws Throwable {
+		Future<MessagePackObject> futureResponse = rpcClient.hello("Josh");
+		Assert.assertNotNull("the response can't be null", futureResponse);
+		MessagePackObject messagePackObject = futureResponse.get();
+		Assert.assertNotNull(messagePackObject != null);
 		String helloMsg = "Josh";
 
-		ResponseArgumentCapturingRequest request =  new ResponseArgumentCapturingRequest("hello",  RawType.create(  helloMsg ));
-		defaultEchoService.hello(  request , helloMsg );
+		ResponseArgumentCapturingRequest request = new ResponseArgumentCapturingRequest("hello", RawType.create(helloMsg));
+		defaultEchoService.hello(request, helloMsg);
 
-		Object resultOfRpcCall = rpcClient.hello( helloMsg).get().asString() ;
+		Object resultOfRpcCall = rpcClient.hello(helloMsg).get().asString();
 
 		Assert.assertEquals("the response sent from the service is indeed the " +
-						"same one as the one we received as client, binding to a" +
-						" different service interface.", request.getResult(), resultOfRpcCall  );
+				                    "same one as the one we received as client, binding to a" +
+				                    " different service interface.", request.getResult(), resultOfRpcCall);
 	}
 
 	@Test

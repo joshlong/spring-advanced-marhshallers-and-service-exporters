@@ -3,13 +3,11 @@ package org.springframework.remoting.messagepack;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DefaultEchoService implements EchoService , CatService {
+public class DefaultEchoService implements EchoService, CatService {
 
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -21,13 +19,14 @@ public class DefaultEchoService implements EchoService , CatService {
 	}
 
 	public DefaultEchoService() {
-		if(executor instanceof InitializingBean)
+		if (executor instanceof InitializingBean) {
 			try {
-				((InitializingBean)executor).afterPropertiesSet();
+				((InitializingBean) executor).afterPropertiesSet();
 			} catch (Exception e) {
-			  log.error(e);
-				throw new RuntimeException(e) ;
+				log.error(e);
+				throw new RuntimeException(e);
 			}
+		}
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class DefaultEchoService implements EchoService , CatService {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep( 3 * 1000);
+					Thread.sleep(3 * 1000);
 					if (log.isDebugEnabled()) {
 						log.debug("sleeping for 10s");
 					}
@@ -79,7 +78,7 @@ public class DefaultEchoService implements EchoService , CatService {
 		return "No, " + in;
 	}
 
-	public void setExecutor( ExecutorService  executor) {
+	public void setExecutor(ExecutorService executor) {
 		this.executor = executor;
 	}
 }

@@ -4,7 +4,7 @@ package org.springframework.remoting.messagepack;
  *
  */
 public class Human {
-	private String name ;
+	private String name;
 
 	public String getName() {
 		return name;
@@ -14,7 +14,7 @@ public class Human {
 		this.name = name;
 	}
 
-    public Human() {
+	public Human() {
 	}
 
 	@Override
