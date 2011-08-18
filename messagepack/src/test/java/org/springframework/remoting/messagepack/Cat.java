@@ -71,4 +71,40 @@ public class Cat {
 				       .append("humans", this.getHumans())
 				       .toString();
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		Cat cat = (Cat) o;
+
+		if (age != cat.age) {
+			return false;
+		}
+		if (friends != null ? !friends.equals(cat.friends) : cat.friends != null) {
+			return false;
+		}
+		if (humans != null ? !humans.equals(cat.humans) : cat.humans != null) {
+			return false;
+		}
+		if (name != null ? !name.equals(cat.name) : cat.name != null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = humans != null ? humans.hashCode() : 0;
+		result = 31 * result + (friends != null ? friends.hashCode() : 0);
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		result = 31 * result + age;
+		return result;
+	}
 }

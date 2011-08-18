@@ -34,8 +34,11 @@ public class Client {
 		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
 		ClientService client = annotationConfigApplicationContext.getBean(ClientService.class);
 
+		String noise  = client.alarm("Danger");
+		System.out.println("Calling "+AlarmService.class.getName()+ "#alarm(String) "  + noise )  ;
+
 		String echoResponse = client.echo("You're stupid.");
-		System.out.println("Calling EchoService#echo(String) " + echoResponse);
+		System.out.println("Calling " +EchoService.class.getName()+ "#echo(String) " + echoResponse);
 
 		Cat garfield = client.fetch();
 		System.out.println(garfield);
