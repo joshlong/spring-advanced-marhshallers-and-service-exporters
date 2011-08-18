@@ -8,10 +8,10 @@ import org.msgpack.rpc.dispatcher.MethodDispatcher;
 import org.msgpack.rpc.loop.EventLoop;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.messagepack.util.MessagePackUtils;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.util.messagepack.MessagePackUtils;
 
 import java.net.InetSocketAddress;
 

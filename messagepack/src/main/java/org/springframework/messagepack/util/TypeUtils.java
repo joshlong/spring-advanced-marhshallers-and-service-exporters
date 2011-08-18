@@ -1,4 +1,4 @@
-package org.springframework.util.messagepack;
+package org.springframework.messagepack.util;
 
 import org.springframework.util.Assert;
 

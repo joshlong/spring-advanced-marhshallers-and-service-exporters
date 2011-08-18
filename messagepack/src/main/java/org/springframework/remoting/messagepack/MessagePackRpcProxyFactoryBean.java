@@ -4,7 +4,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.msgpack.MessagePackObject;
 import org.msgpack.rpc.Client;
 import org.msgpack.rpc.config.ClientConfig;
 import org.msgpack.rpc.loop.EventLoop;
@@ -12,18 +11,9 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.messagepack.util.MessagePackUtils;
 import org.springframework.remoting.support.RemoteAccessor;
 import org.springframework.util.Assert;
-import org.springframework.util.messagepack.MessagePackUtils;
-import org.springframework.util.messagepack.ReflectionUtils;
-import org.springframework.util.messagepack.TypeUtils;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Used to create client side proxies that can communicate with the remote services.
@@ -95,82 +85,9 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 			if (log.isDebugEnabled()) {
 				log.debug("the client called: " + invocation.getMethod().toGenericString());
 			}
-
-			/*Method method = invocation.getMethod();
-			if (Future.class.isAssignableFrom(method.getReturnType())) {
-				// then we need to make sure to do the right thing
-
-				Class[] genericTypes = TypeUtils.getGenericTypesForReturnValue( method) ;
-				if( genericTypes != null && genericTypes.length == 1){
-					Class genericType = genericTypes [0];
-					Future realFuture = (Future) invocation.proceed();
-					return new ResultConvertingDelegatingFuture( genericType, realFuture ) ;
-				}
-			}*/
 			return MessagePackUtils.remapResult(invocation.proceed());
 		}
-
 	}
-
-	static class ResultConvertingDelegatingFuture<T> implements Future<T> {
-		private Future<MessagePackObject> delegate;
-		private Class<T> classOfExpectedResult;
-
-		public ResultConvertingDelegatingFuture(Class<T> c, Future<MessagePackObject> f) {
-			this.delegate = f;
-			this.classOfExpectedResult = c;
-		}
-
-		@Override
-		public boolean cancel(boolean b) {
-			return delegate.cancel(b);
-		}
-
-		@Override
-		public boolean isCancelled() {
-			return delegate.isCancelled();
-		}
-
-		@Override
-		public boolean isDone() {
-			return delegate.isDone();
-		}
-
-		@Override
-		public T get() throws InterruptedException, ExecutionException {
-
-			Object  result = delegate.get();
-
-			if (result != null) {
-				try {
-					if(result instanceof MessagePackObject)
-						return MessagePackUtils.remapResult(((MessagePackObject)result).convert(classOfExpectedResult));
-					else {
-						return (T) MessagePackUtils.remapResult( result ) ;
-					}
-				} catch (Throwable throwable) {
-	                 throw new RuntimeException(throwable) ;
-				}
-			}
-			return null;
-		}
-
-		@Override
-		public T get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-			MessagePackObject result = delegate.get(l, timeUnit);
-
-			if (result != null) {
-				try {
-					return MessagePackUtils.remapResult(result.convert(classOfExpectedResult));
-				} catch (Throwable throwable) {
-	                 throw new RuntimeException(throwable) ;
-				}
-			}
-
-			return null;
-		}
-	}
-
 
 	@SuppressWarnings("unchecked")
 	@Override

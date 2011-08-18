@@ -40,8 +40,6 @@ public class MessagePackServiceExporterTest {
 			svc.setHost(HOST);
 			return svc;
 		}
-
-
 	}
 
 	@Configuration

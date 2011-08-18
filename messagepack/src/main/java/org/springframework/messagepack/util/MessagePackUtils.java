@@ -1,4 +1,4 @@
-package org.springframework.util.messagepack;
+package org.springframework.messagepack.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,8 +19,6 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 @SuppressWarnings("unchecked")
 public abstract class MessagePackUtils {
-
-//	static private Log log = LogFactory.getLog(MessagePackUtils.class);
 
 	private static final BeansTemplateBuilder beansTemplateBuilder = new BeansTemplateBuilder();
 
