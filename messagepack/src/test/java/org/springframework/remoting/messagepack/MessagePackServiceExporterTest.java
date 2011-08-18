@@ -91,7 +91,31 @@ public class MessagePackServiceExporterTest {
 		serverContext.stop();
 	}
 
+	@Test
+	public void testRetrievingCollections() throws Throwable {
 
+
+		Cat rpcCat = rpcClient.fetch();
+		Cat localCat = defaultEchoService.fetch();
+
+		Assert.assertEquals(localCat.getFriends().size(), rpcCat.getFriends().size());
+		Assert.assertEquals(localCat.getHumans().size(), rpcCat.getHumans().size());
+
+		Set<Cat> localFriends = localCat.getFriends();
+		Set<Cat> remoteFriends = rpcCat.getFriends();
+		for (Cat c : remoteFriends) {
+			Assert.assertTrue(localFriends.contains(c));
+		}
+
+		Set<Human> localHumans = localCat.getHumans();
+		Set<Human> remoteHumans = rpcCat.getHumans();
+
+		for (Human h : localHumans) {
+			Assert.assertTrue(remoteHumans.contains(h));
+		}
+	}
+
+	// 661 250 5230
 	@Test
 	public void testFutureWorks() throws Throwable {
 
@@ -143,27 +167,5 @@ public class MessagePackServiceExporterTest {
 		Assert.assertEquals(rpcClient.alarm(arg), defaultEchoService.alarm(arg));
 	}
 
-	@Test
-	public void testRetrievingCollections() throws Throwable {
 
-
-		Cat rpcCat = rpcClient.fetch();
-		Cat localCat = defaultEchoService.fetch();
-
-		Assert.assertEquals(localCat.getFriends().size(), rpcCat.getFriends().size());
-		Assert.assertEquals(localCat.getHumans().size(), rpcCat.getHumans().size());
-
-		Set<Cat> localFriends = localCat.getFriends();
-		Set<Cat> remoteFriends = rpcCat.getFriends();
-		for (Cat c : remoteFriends) {
-			Assert.assertTrue(localFriends.contains(c));
-		}
-
-		Set<Human> localHumans = localCat.getHumans();
-		Set<Human> remoteHumans = rpcCat.getHumans();
-
-		for (Human h : localHumans) {
-			Assert.assertTrue(remoteHumans.contains(h));
-		}
-	}
 }

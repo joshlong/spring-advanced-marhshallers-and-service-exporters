@@ -2,18 +2,24 @@ package org.springframework.remoting.messagepack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.msgpack.MessagePack;
+import org.msgpack.Template;
 import org.msgpack.rpc.Server;
 import org.msgpack.rpc.config.ClientConfig;
 import org.msgpack.rpc.dispatcher.MethodDispatcher;
 import org.msgpack.rpc.loop.EventLoop;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.messagepack.MessagePackRegistrar;
 import org.springframework.messagepack.util.MessagePackUtils;
+import org.springframework.messagepack.util.ReflectionUtils;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.net.InetSocketAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link RemoteInvocationBasedExporter} based on the {@link org.msgpack.MessagePack} RPC framework.
@@ -35,10 +41,12 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 	private int listenPort = 1995;
 	private InetSocketAddress address;
 	private EventLoop eventLoop;
-
-
 	private boolean exportServiceParameters = true;
 	private boolean serializeJavaBeanProperties = true;
+
+	private Set<Class> classes =new HashSet<Class>() ;
+
+	private MessagePackRegistrar registrar = new MessagePackRegistrar();
 
 	public void setExportServiceParameters(boolean exportServiceParameters) {
 		this.exportServiceParameters = exportServiceParameters;
@@ -90,16 +98,20 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 		return svr;
 	}
 
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		Object service = getService();
 		Class<?> serviceInterface = getServiceInterface();
 
-		if (exportServiceParameters) {
-			MessagePackUtils.findAndRegisterAllClassesRelatedToClass(service.getClass(), this.serializeJavaBeanProperties);
+		Object service = getService();
+
+		registrar.setSerializeJavaBeanProperties(this.serializeJavaBeanProperties);
+		if(exportServiceParameters) {
+			registrar.discoverClasses( service.getClass());
 		}
+		registrar.registerClasses(this.classes);
+		registrar.afterPropertiesSet();
+
 
 		Assert.notNull(service, "the service target can NOT be null!");
 

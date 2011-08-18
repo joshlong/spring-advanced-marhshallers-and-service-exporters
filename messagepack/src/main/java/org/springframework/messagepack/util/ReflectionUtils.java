@@ -3,6 +3,7 @@ package org.springframework.messagepack.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.msgpack.MessagePack;
+import org.springframework.core.GenericCollectionTypeResolver;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -12,18 +13,15 @@ import java.util.*;
  * obviously incorrect objects like objects from MesssagePack itself (which shouldnt be registered), and objects from the JDK that
  * already are registered (like 'int') or shouldn't be (like 'void')
  *
- *  @author Josh Long
+ * @author Josh Long
  */
 public abstract class ReflectionUtils {
 
 	private static Log log = LogFactory.getLog(ReflectionUtils.class);
 
 
-
 	/**
 	 * Callback for the {@link TypeUtils#getGenericTypesForReturnValue(java.lang.reflect.Method)} method.
-	 *
-	 *
 	 */
 	public static interface ClassTraversalCallback {
 		void doWithClass(Class<?> o);
@@ -61,7 +59,7 @@ public abstract class ReflectionUtils {
 				}
 
 				return !method.getDeclaringClass().getPackage().getName().equalsIgnoreCase(packageForJavaLang)
-						   && !methods.contains(method);
+						       && !methods.contains(method);
 			}
 		};
 
@@ -76,21 +74,18 @@ public abstract class ReflectionUtils {
 		}
 
 
-
 		protected void doCrawl(Class<?> clzz, final Set<Class> toVisit, final ClassTraversalCallback callback) {
 			org.springframework.util.ReflectionUtils.MethodCallback mc = new org.springframework.util.ReflectionUtils.MethodCallback() {
 				@Override
 				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 					Collection<Class> classesToVisit = findClassesToVisit(method);
 					for (Class c : classesToVisit) {
-						if(!isUninterestingClass(c)&&!shouldSkip(c)) {
-								if (!toVisit.contains(c)) {
-									toVisit.add(c);
-									doCrawl(c, toVisit, callback);
-									callback.doWithClass(c);
-								}
-
-
+						if (!isUninterestingClass(c) && !shouldSkip(c)) {
+							if (!toVisit.contains(c)) {
+								toVisit.add(c);
+								doCrawl(c, toVisit, callback);
+								callback.doWithClass(c);
+							}
 						}
 					}
 				}
@@ -111,19 +106,18 @@ public abstract class ReflectionUtils {
 
 
 	/**
-		 * is the class a unique class likely to be worth registering?
-		 *
-		 *
-		 * @param clazz
-		 * @return
-		 */
-		public  static boolean isUninterestingClass(Class<?> clazz) {
+	 * is the class a unique class likely to be worth registering?
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	public static boolean isUninterestingClass(Class<?> clazz) {
 		String javaPackage = "java";
 		String messagePackPackage = MessagePack.class.getPackage().getName();
 		String clazzName = clazz.getName();
 		return !(!clazzName.startsWith(javaPackage) && !clazzName.startsWith(messagePackPackage) &&
-				 !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() &&
-				 !clazzName.startsWith(MessagePack.class.getPackage().getName()));
-		}
+				         !clazz.isInterface() && !clazz.isPrimitive() && !clazz.isArray() &&
+				         !clazzName.startsWith(MessagePack.class.getPackage().getName()));
+	}
 
 }

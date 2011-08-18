@@ -2,12 +2,11 @@ package org.springframework.messagepack.util;
 
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
+import java.util.HashSet;
+import java.util.Set;
 
-/***
+/**
  * patterned very much after {@link org.springframework.util.TypeUtils}
  *
  * @author Josh Long
@@ -15,7 +14,7 @@ import java.lang.reflect.WildcardType;
 abstract public class TypeUtils {
 
 
-	public static Class[] getGenericTypesForReturnValue(Method method) {
+	 static public Class[] getGenericTypesForReturnValue(Method method) {
 		Type t1 = method.getGenericReturnType();
 		if (t1 instanceof ParameterizedType) {
 

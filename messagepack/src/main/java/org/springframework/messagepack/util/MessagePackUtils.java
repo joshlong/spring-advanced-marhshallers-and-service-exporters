@@ -1,16 +1,10 @@
 package org.springframework.messagepack.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.msgpack.MessagePack;
 import org.msgpack.MessagePackObject;
-import org.msgpack.Template;
-import org.msgpack.template.builder.BeansTemplateBuilder;
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
+import org.springframework.core.GenericCollectionTypeResolver;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -20,11 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 @SuppressWarnings("unchecked")
 public abstract class MessagePackUtils {
 
-	private static final BeansTemplateBuilder beansTemplateBuilder = new BeansTemplateBuilder();
-
-	private static final Log log = LogFactory.getLog(MessagePackUtils.class.getName());
-
-	private static <T> Collection<T> buildReplacementCollectionForOriginalProperty(Collection<T> in) throws Throwable {
+	private static <T> Collection<T> buildReplacementCollection(Collection<T> in) throws Throwable {
 
 		int size = in.size();
 		if (in.getClass().isInterface()) {
@@ -38,15 +28,10 @@ public abstract class MessagePackUtils {
 			if (in.getClass().equals(Queue.class)) {
 				return new ArrayBlockingQueue<T>(size);
 			}
-
 		} else {
 			return in.getClass().newInstance();
 		}
-
-		// it's impossible to get here, right?
-		Assert.isInstanceOf(Collection.class, in, "this is not a known Collection");
-
-		return null;
+		throw new RuntimeException("we couldn't figure out a replacement collection for the input collection type, " + in.getClass().getName());
 	}
 
 	private static Object convertMessagePackObject(Object input, Class<?> clzz) {
@@ -58,76 +43,52 @@ public abstract class MessagePackUtils {
 	}
 
 
-	/**
-	 * this shoud ideally do something smart like recursively walk the object tree, but for now let's worry about top level stuff ....
-	 */
-	public static <T> T remapResult(T result) throws Throwable {
+	public static <T> T remapResult(final T result) throws Throwable {
 		Class<?> clazzOfT = result.getClass();
 
 		if (ReflectionUtils.isUninterestingClass(clazzOfT)) {
 			return result;
 		}
 
-		// there are a couple of things that this method can do
-		// reconstitute weird ass result objects themselves
-		PropertyDescriptor descriptor[] = BeanUtils.getPropertyDescriptors(clazzOfT);
-		for (PropertyDescriptor pd : descriptor) {
-			Method readMethod = pd.getReadMethod();
-			Method writeMethod = pd.getWriteMethod();
-			Class<?> readerReturnClazz = readMethod.getReturnType();
-			if (readerReturnClazz.isPrimitive() || MessagePackObject.class.isAssignableFrom(readerReturnClazz)) {
-				// do nothing
-			} else if (Collection.class.isAssignableFrom(readerReturnClazz)) {
-				Collection values = (Collection) readMethod.invoke(result);
-				Class[] genericClasses = TypeUtils.getGenericTypesForReturnValue(readMethod);
-				Collection destination = buildReplacementCollectionForOriginalProperty(values);
-				for (Object srcObject : values) {
-					destination.add(convertMessagePackObject(srcObject, genericClasses[0]));
-				}
-				writeMethod.invoke(result, destination);
-			} else {
-				// its a generic object in the type registry somewhere
-			}
-		}
 
-		return result ;
-	}
-
-
-	public static void registerClass(Class<?> clazz, boolean serializeJavaBeanProperties) {
-
-		if (ReflectionUtils.isUninterestingClass(clazz)) {
-			return;
-		}
-
-		if (serializeJavaBeanProperties) {
-			Template template = beansTemplateBuilder.buildTemplate(clazz);
-			MessagePack.register(clazz, template);
-		} else {
-			MessagePack.register(clazz);
-		}
-	}
-
-	/**
-	 * Scans a given class and looks at all methods, return parameters, etc., and automatically registers them.
-	 * First, this does not (for obvious reasons) register primitives, or JDK classes, or even java.util.* classes, since
-	 * there's no possible use case for those and since - in the common case - the serialization already supports them, anyway.
-	 *
-	 * @param clzz      the interface to scan for types
-	 * @param serialize whether or not the JavaBean types should be serialized using javabeans conventions or the public class property.
-	 */
-	public static void findAndRegisterAllClassesRelatedToClass(final Class<?> clzz, final boolean serialize) {
-		ReflectionUtils.crawlJavaBeanObjectGraph(clzz, new ReflectionUtils.ClassTraversalCallback() {
+		org.springframework.util.ReflectionUtils.doWithFields(result.getClass(), new org.springframework.util.ReflectionUtils.FieldCallback() {
 			@Override
-			public void doWithClass(Class<?> foundClass) {
-				if (log.isDebugEnabled()) {
-					log.debug("found " + foundClass.getName() + ".");
+			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+				try {
+
+					if (org.springframework.util.ReflectionUtils.isPublicStaticFinal(field) || Modifier.isFinal(field.getModifiers())) {
+						return;
+					}
+
+					if (!field.isAccessible()) {
+						field.setAccessible(true);
+					}
+
+					Object value = field.get(result);
+
+					if (Collection.class.isAssignableFrom(value.getClass())) {
+
+						Collection<?> values = (Collection<?>) value;
+						Collection destination = buildReplacementCollection(values);
+						Class<?> classOfCollection = GenericCollectionTypeResolver.getCollectionFieldType(field);
+						for (Object srcObject : values) {
+							if (srcObject instanceof MessagePackObject) {
+								destination.add(convertMessagePackObject(srcObject, classOfCollection));
+							} else {
+								destination.add(srcObject);
+							}
+						}
+						// set the new value in place
+						field.set(result, destination);
+					}
+				} catch (Throwable thr) {
+					throw new RuntimeException(thr);
 				}
-				MessagePackUtils.registerClass(foundClass, serialize);
 			}
 		});
-	}
 
+		return result;
+	}
 
 
 }

@@ -11,9 +11,13 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.messagepack.MessagePackRegistrar;
 import org.springframework.messagepack.util.MessagePackUtils;
 import org.springframework.remoting.support.RemoteAccessor;
 import org.springframework.util.Assert;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Used to create client side proxies that can communicate with the remote services.
@@ -30,9 +34,13 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 	private boolean remapResults = true;
 
 	private boolean exportServiceParameters = true;
-
+	private Set<Class> classes = new HashSet<Class>();
 	private boolean serializeJavaBeanProperties = true;
+
+	private MessagePackRegistrar registrar = new MessagePackRegistrar();
+
 	private ClientConfig clientConfig;
+
 	private Client client;
 	private EventLoop eventLoop;
 	private T proxy;
@@ -46,10 +54,6 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 
 	public void setPort(int port) {
 		this.port = port;
-	}
-
-	public ClassLoader getClassLoader() {
-		return classLoader;
 	}
 
 	@Override
@@ -79,7 +83,7 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 	 * Well, using some heuristics (specifically, w.r.t. to generics), we can automatically remap these results onto your domain
 	 * POJOs for you, transparently, before you get the results.
 	 */
-	private class ObjectGraphRepairingMethodInterceptor implements MethodInterceptor {
+	private MethodInterceptor objectGraphCleaningMethodInterceptor = new MethodInterceptor (){
 		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			if (log.isDebugEnabled()) {
@@ -87,14 +91,18 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 			}
 			return MessagePackUtils.remapResult(invocation.proceed());
 		}
-	}
+	};
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (exportServiceParameters) {
-			MessagePackUtils.findAndRegisterAllClassesRelatedToClass(getServiceInterface(), this.serializeJavaBeanProperties);
+
+		registrar.setSerializeJavaBeanProperties(this.serializeJavaBeanProperties);
+		if(exportServiceParameters) {
+			registrar.discoverClasses(  getServiceInterface());
 		}
+		registrar.registerClasses(this.classes);
+		registrar.afterPropertiesSet();
 
 		if (eventLoop == null) {
 			this.eventLoop = new EventLoopFactoryBean().getObject();
@@ -113,7 +121,7 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 		if (remapResults) {
 			ProxyFactory factory = new ProxyFactory(p);
 			factory.addInterface(getServiceInterface());
-			factory.addAdvice(new ObjectGraphRepairingMethodInterceptor());
+			factory.addAdvice(objectGraphCleaningMethodInterceptor);
 			p = (T) factory.getProxy(getBeanClassLoader());
 		}
 		this.proxy = (T) p;
@@ -121,7 +129,6 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 		Assert.notNull(this.proxy, "the proxy can't be null");
 
 	}
-
 
 	/**
 	 * Should the results be re-built based on heuristics designed to capture the intent of the code
@@ -132,8 +139,13 @@ public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements
 		this.remapResults = remapResults;
 	}
 
+
 	public void setExportServiceParameters(boolean exportServiceParameters) {
 		this.exportServiceParameters = exportServiceParameters;
+	}
+
+	public void setClientConfig(ClientConfig clientConfig) {
+		this.clientConfig = clientConfig;
 	}
 
 	public void setSerializeJavaBeanProperties(boolean serializeJavaBeanProperties) {
