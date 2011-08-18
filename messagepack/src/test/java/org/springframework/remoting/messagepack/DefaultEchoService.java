@@ -73,24 +73,24 @@ public class DefaultEchoService implements EchoService, CatService {
 		});
 	}
 
-	public void fetchCat  ( final org.msgpack.rpc.Request  request ){
-	  executor.submit(
-	  new Runnable() {
-		  @Override
-		  public void run() {
-			   try {
-			     Thread.sleep(3 * 1000);
-			     Cat cat =fetch()  ;
-			     request.sendResult( cat );
-			   } catch (Throwable thro) {
+	public void fetchCat(final org.msgpack.rpc.Request request) {
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3 * 1000);
+					Cat cat = fetch();
+					request.sendResult(cat);
+				} catch (Throwable thro) {
 					if (log.isErrorEnabled()) {
 						log.error(thro);
 					}
 				}
-		  }
-	  }
-	  ) ;
+			}
+		}
+		);
 	}
+
 	@Override
 	public String echo(String in) {
 		return "No, " + in;
