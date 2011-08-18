@@ -1,7 +1,6 @@
 package org.springframework.remoting.messagepack;
 
 import org.msgpack.rpc.loop.EventLoop;
-import org.msgpack.rpc.loop.netty.NettyEventLoop;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
