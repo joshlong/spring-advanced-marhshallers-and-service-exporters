@@ -50,7 +50,6 @@ public abstract class MessagePackUtils {
 			return result;
 		}
 
-
 		org.springframework.util.ReflectionUtils.doWithFields(result.getClass(), new org.springframework.util.ReflectionUtils.FieldCallback() {
 			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
