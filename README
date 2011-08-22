@@ -1,2 +1,9 @@
 http://www.schnada.de/grapt/eriknaggum-xmlrant.html
 http://www.reddit.com/r/programming/comments/eaqgk
+
+todo:
+ the support defined here should work for:
+  -- service exporters (where possible)
+  -- HttpMessageConverters (REST serialization)
+  -- JMS MessageConverters
+  -- AMQP MessageConverters
