@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 
 public class Crm {
 
+  /**
+   * the CRM service interface
+   */
   public interface Iface {
 
     public Customer createCustomer(String fn, String ln, String email) throws org.apache.thrift.TException;

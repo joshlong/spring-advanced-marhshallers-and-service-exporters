@@ -44,12 +44,12 @@ import java.util.Arrays;
  * This {@link org.springframework.http.converter.HttpMessageConverter} works well with both the {@link org.springframework.web.client.RestTemplate}
  * on the client and and the server-side Spring MVC-based REST support.
  *
+ *
  * @author Josh Long
  * @see org.springframework.http.converter.HttpMessageConverter
  * @see org.apache.thrift.server.TServlet
  * @see org.springframework.web.client.RestTemplate
  */
-
 public class ThriftHttpMessageConverter extends AbstractHttpMessageConverter<Object> implements InitializingBean {
 
 	private Log log = LogFactory.getLog(getClass());
