@@ -16,29 +16,21 @@
 
 package org.springframework.thrift.rpc;
 
-
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TSocket;
+import org.springframework.remoting.thrift.ThriftProxyFactoryBean;
 import org.springframework.thrift.crm.Crm;
 import org.springframework.thrift.crm.Customer;
+import org.springframework.util.ClassUtils;
 
 public class Client {
-
-	static void setup() throws Throwable {
-		TSocket socket = new TSocket("localhost", 9090);
-		TBinaryProtocol protocol = new TBinaryProtocol(socket);
-
-		Crm.Client client = new Crm.Client(protocol);
-
-		socket.open();
-		Customer customer = client.createCustomer("josh", "Long", "josh.long@email.com");
-
-		System.out.println(ToStringBuilder.reflectionToString(customer) );
-
-	}
-
 	static public void main(String args[]) throws Throwable {
-		setup();
+		ThriftProxyFactoryBean client = new ThriftProxyFactoryBean();
+		client.setBeanClassLoader(ClassUtils.getDefaultClassLoader());
+		client.setServiceInterface(Crm.class);
+		client.afterPropertiesSet();
+		Object proxy = client.getObject();
+		Crm.Iface clientProxy = (Crm.Iface) proxy;
+		Customer customer = clientProxy.createCustomer("josh", "Long", "josh.long@email.com");
+		System.out.println(ToStringBuilder.reflectionToString(customer));
 	}
 }

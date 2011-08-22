@@ -24,11 +24,13 @@ import org.apache.thrift.transport.TServerSocket;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
+import org.springframework.thrift.util.ThriftUtil;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
-import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
+
+import static org.springframework.thrift.util.ThriftUtil.IFACE_NAME;
+import static org.springframework.thrift.util.ThriftUtil.buildProcessor;
 
 /**
  * Simple service exporter to automatically export Thrift services
@@ -38,25 +40,15 @@ import java.net.InetSocketAddress;
 public class ThriftExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
 
 
-	/**
-	 * String to find interface of the class inside the Thrift service that we should bind this service to publically
-	 */
-	public static String IFACE_NAME = "$Iface";
-
-	/**
-	 * the name of the internal Processor class
-	 */
-	public static String PROCESSOR_NAME = "$Processor";
-
 	private Class thriftClass;
 
-	private TServer tServer ;
+	private TServer tServer;
 
 	private volatile boolean running = false;
 
-	private TProcessor processor ;
+	private TProcessor processor;
 
-	private int listenPort = 1995;
+	private int listenPort = ThriftUtil.DEFAULT_PORT;
 
 	private InetSocketAddress address;
 
@@ -68,84 +60,25 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 		this.address = address;
 	}
 
-	@SuppressWarnings("unchecked")
-	private TProcessor buildProcessor() throws Exception {
-		Class <TProcessor> processorClass = (Class<TProcessor>) getThriftServiceInnerClassOrNull(thriftClass, PROCESSOR_NAME, false);
-		Assert.notNull(processorClass, "the processor class must not be null");
 
-		Constructor constructor = ClassUtils.getConstructorIfAvailable(processorClass, getServiceInterface());
-		Assert.notNull(constructor);
-
-		Object newlyCreatedProcessorBean = constructor.newInstance(getService());
-		Assert.notNull(newlyCreatedProcessorBean);
-		Assert.isInstanceOf(TProcessor.class, newlyCreatedProcessorBean);
-
-		return (TProcessor) newlyCreatedProcessorBean;
-	}
-
-
-	protected void establishThriftServiceClass(Class parentClass) {
-		this.thriftClass = parentClass.getEnclosingClass();
-		if (logger.isDebugEnabled()) {
-			logger.debug("the parent class is " + this.thriftClass.getName());
-		}
-		Assert.notNull(this.thriftClass);
-	}
-
-	protected Class getThriftServiceInnerClassOrNull(Class thriftServiceClass, String mustContain, boolean isInterface) {
-		Class[] declaredClasses = thriftServiceClass.getDeclaredClasses();
-
-
-		for (Class declaredClass : declaredClasses) {
-			if (declaredClass.isInterface()) {
-				if (isInterface && declaredClass.getName().contains(mustContain)) {
-					return declaredClass;
-				}
-			} else {
-				if (!isInterface && declaredClass.getName().contains(mustContain)) {
-					return declaredClass;
-				}
-			}
-		}
-
-
-		return null;
-	}
 
 	@Override
 	public void setServiceInterface(Class serviceInterface) {
-		if (serviceInterface.isInterface()) {
-			String iFaceNameConvention = serviceInterface.getName();
-			if (iFaceNameConvention.contains(IFACE_NAME)) {
-				Class<?> clzz = serviceInterface.getEnclosingClass();
-				Assert.notNull(clzz, "the enclosing class can not be null");
-				establishThriftServiceClass(serviceInterface);
-				super.setServiceInterface(serviceInterface);
-			}
-		} else if (!serviceInterface.isInterface()) {
-
-			Class iface = this.getThriftServiceInnerClassOrNull(serviceInterface, IFACE_NAME, true);
-			Assert.notNull(iface, "the service interface was not found, but is required");
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("setting " + iface.getName() + " as the service interface.");
-			}
-			establishThriftServiceClass(iface);
-			super.setServiceInterface(iface);
-		}
-
+		super.setServiceInterface(ThriftUtil.buildServiceInterface(serviceInterface));
+		this.thriftClass = getServiceInterface().getEnclosingClass();
+		Assert.notNull(this.thriftClass, "the 'thriftClass' can't be null");
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Class serviceInterface = getServiceInterface();
 		Object service = getService();
+
 		Assert.notNull(service, "the service must not be null");
 		Assert.notNull(serviceInterface, "the serviceInterface must not be null");
-
 		Assert.isTrue(serviceInterface.isAssignableFrom(service.getClass()));
 
-		this.processor = buildProcessor()  ;
+		this.processor = ThriftUtil.buildProcessor(thriftClass, getServiceInterface(), getService());
 
 	}
 
@@ -174,17 +107,16 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 				logger.debug("starting " + ThriftExporter.class.getName() + ". This exporter's only been tested on Thrift 0.7. Your mileage may vary with other versions");
 			}
 
-
-			TServerSocket socket =  null ;
-			if( this.address != null ){
+			TServerSocket socket = null;
+			if (this.address != null) {
 				socket = new TServerSocket(this.address);
 			} else {
-				socket = new TServerSocket(this.listenPort) ;
+				socket = new TServerSocket(this.listenPort);
 			}
 			TThreadPoolServer.Args args = new TThreadPoolServer.Args(socket);
 			args.processor(processor);
 
-			tServer  = new TThreadPoolServer(args) ;
+			tServer = new TThreadPoolServer(args);
 			tServer.serve();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -193,7 +125,7 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 
 	@Override
 	public void stop() {
-		if(null != this.tServer){
+		if (null != this.tServer) {
 			tServer.stop();
 		}
 		this.running = false;
