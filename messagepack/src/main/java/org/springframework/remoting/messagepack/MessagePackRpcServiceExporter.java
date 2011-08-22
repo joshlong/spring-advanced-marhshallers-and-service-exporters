@@ -183,12 +183,15 @@ public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter
 	public void stop(Runnable callback) {
 		stop();
 		callback.run();
+		running = false ;
 	}
 
 	@Override
 	public void start() {
 		try {
+
 			eventLoop.join();
+			running = true ;
 		} catch (InterruptedException e) {
 			if (log.isErrorEnabled()) {
 				log.debug(e);

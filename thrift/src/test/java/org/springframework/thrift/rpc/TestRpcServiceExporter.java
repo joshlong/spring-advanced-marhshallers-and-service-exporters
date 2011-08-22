@@ -47,13 +47,15 @@ public class TestRpcServiceExporter {
 
 		CustomCrmService crmService = new CustomCrmService();
 
-
 		ThriftExporter exporter = new ThriftExporter();
 		exporter.setService(crmService);
 		exporter.setServiceInterface( Crm. class);
 		exporter.setBeanClassLoader(ClassUtils.getDefaultClassLoader());
 		exporter.afterPropertiesSet();
+		exporter.start();
 
+		Thread.sleep(1000 * 2);
+		exporter.stop(  null );
 
 	}
 
