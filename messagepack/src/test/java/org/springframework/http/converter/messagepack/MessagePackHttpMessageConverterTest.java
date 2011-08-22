@@ -93,6 +93,7 @@ public class MessagePackHttpMessageConverterTest {
 		return new ByteArrayInputStream(bytes);
 	}
 
+	// todo fix this silly test
 	@Test
 	public void testHttpReading() throws Throwable {
 		Assert.assertTrue("the converter should be able to read the class.", converter.canRead(CatWithProperties.class, messagePackMediaType));
