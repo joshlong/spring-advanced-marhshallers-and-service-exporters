@@ -58,7 +58,6 @@ public class ThriftHttpMessageConverterTest {
 	@Test
 	public void testHttpWriting() throws Throwable {
 		Assert.assertTrue("the converter should be able to read the class", thriftMessageConverter.canWrite(Customer.class, thriftMediaType));
-		Class<Customer> classToWrite = Customer .class;
 		HttpHeaders headers = Mockito.mock(HttpHeaders.class);
 		HttpOutputMessage httpOutputMessage = Mockito.mock(HttpOutputMessage.class);
 		Mockito.when(httpOutputMessage.getHeaders()).thenReturn(headers);
@@ -75,7 +74,6 @@ public class ThriftHttpMessageConverterTest {
 		Assert.assertEquals("the two customers should have the same properties ", this.customer, readCustomer);
 	}
 
-	// todo fix the same test in the MessagePack code on master
 	@Test
 	public void testHttpReading() throws Throwable {
 		Assert.assertTrue("the converter should be able to read the class.", thriftMessageConverter.canRead(Customer.class, thriftMediaType));
