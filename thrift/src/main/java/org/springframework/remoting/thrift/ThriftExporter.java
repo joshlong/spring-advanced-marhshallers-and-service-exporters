@@ -29,16 +29,15 @@ import org.springframework.util.Assert;
 
 import java.net.InetSocketAddress;
 
-import static org.springframework.thrift.util.ThriftUtil.IFACE_NAME;
-import static org.springframework.thrift.util.ThriftUtil.buildProcessor;
-
 /**
- * Simple service exporter to automatically export Thrift services
+ * Exports Thrift based RPC services. Requires for the {@link #serviceInterface} property
+ * a reference to the IFace class inside the Thrift generated class, e.g., {@code Foo.IFace.class}.
+ *
+ * The {@link #service} itself is any POJO, but that POJO must implement the {@link #serviceInterface}.
  *
  * @author Josh Long
  */
 public class ThriftExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
-
 
 	private Class thriftClass;
 
@@ -59,7 +58,6 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 	public void setAddress(InetSocketAddress address) {
 		this.address = address;
 	}
-
 
 
 	@Override
@@ -116,8 +114,13 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 			TThreadPoolServer.Args args = new TThreadPoolServer.Args(socket);
 			args.processor(processor);
 
+			if (logger.isDebugEnabled()) {
+				logger.debug("starting to listen on " + socket.getServerSocket().toString());
+			}
+
 			tServer = new TThreadPoolServer(args);
 			tServer.serve();
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

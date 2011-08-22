@@ -69,7 +69,7 @@ public class ThriftHttpMessageConverterTest {
 		byteArrayOutputStream.flush();
 		byteArrayOutputStream.close();
 		byte[] bytesWritten = byteArrayOutputStream.toByteArray();
-		Customer readCustomer= new Customer() ;
+		Customer readCustomer = new Customer();
 		deserializer.deserialize(readCustomer, bytesWritten);
 		Assert.assertEquals("the two customers should have the same properties ", this.customer, readCustomer);
 	}

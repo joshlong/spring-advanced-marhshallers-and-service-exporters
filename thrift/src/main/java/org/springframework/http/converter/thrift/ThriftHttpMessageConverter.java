@@ -36,14 +36,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- *
  * This class is different than the {@link org.apache.thrift.server.TServlet thrift servlet} that ships with
  * Thrift itself. This class lets you use send RESTful requests and responses with Thrift structures as the
  * payloads. This is different from using a servlet for the server-side end of the HTTP-based Thrift RPC transport.
- *
+ * <p/>
  * This {@link org.springframework.http.converter.HttpMessageConverter} works well with both the {@link org.springframework.web.client.RestTemplate}
  * on the client and and the server-side Spring MVC-based REST support.
- *
  *
  * @author Josh Long
  * @see org.springframework.http.converter.HttpMessageConverter
@@ -122,6 +120,7 @@ public class ThriftHttpMessageConverter extends AbstractHttpMessageConverter<Obj
 
 	/**
 	 * optional
+	 *
 	 * @param deserializer the {@link TDeserializer Thrift deserializer}
 	 */
 	public void setDeserializer(TDeserializer deserializer) {
@@ -130,6 +129,7 @@ public class ThriftHttpMessageConverter extends AbstractHttpMessageConverter<Obj
 
 	/**
 	 * optional
+	 *
 	 * @param serializer the {@link TSerializer Thrift serializer}
 	 */
 	public void setSerializer(TSerializer serializer) {
