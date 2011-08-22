@@ -3,7 +3,7 @@ If you're new to Thrift, then you might check the apache website to see if they'
 Here's one that's quite good: http://www.thrift.pl/Thrift-tutorial-installation.html
 Also, see http://blog.newitfarmer.com/software-develop/open-source/869/install-thrift-on-linux/
 Also, http://diwakergupta.github.com/thrift-missing-guide/
-
+Also, http://unknownerror.net/2011-08/thrift-java-server-and-client-examples-50052
 
 # naturally, this all presumes you've got a JDK >= 5 installed.
 # I did the following on my box to get it the point where it looked like it worked)
