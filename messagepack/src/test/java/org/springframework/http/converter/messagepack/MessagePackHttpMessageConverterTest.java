@@ -112,20 +112,27 @@ public class MessagePackHttpMessageConverterTest {
 	// todo fix this silly test
 	@Test
 	public void testHttpReading() throws Throwable {
+		MessagePack.register(CatWithProperties.class);
 		Assert.assertTrue("the converter should be able to read the class.", converter.canRead(CatWithProperties.class, messagePackMediaType));
 		CatWithProperties srcCat = new CatWithProperties("George", 22);
 		HttpHeaders headers = Mockito.mock(HttpHeaders.class);
 		HttpInputMessage inputMessage = Mockito.mock(HttpInputMessage.class);
 		Mockito.when(headers.getContentType()).thenReturn(this.messagePackMediaType);
 		Mockito.when(inputMessage.getHeaders()).thenReturn(headers);
+
 		InputStream inputStream = fakeInputStream(srcCat);
-		CatWithProperties cwp = MessagePack.unpack(inputStream, srcCat.getClass());
+		Mockito.when(inputMessage.getBody()).thenReturn( inputStream );
+
+		CatWithProperties catWithProperties =(CatWithProperties)converter.read( CatWithProperties.class , inputMessage) ;
+		CatWithProperties cwp = MessagePack.unpack( fakeInputStream(srcCat), srcCat.getClass());
+
 		Assert.assertEquals(cwp, srcCat);
+		Assert.assertEquals(cwp, catWithProperties);
 	}
 
 	@Test
 	public void testHttpWriting() throws Throwable {
-		Assert.assertTrue("the converter should be able to read the class", converter.canWrite(CatWithProperties.class, messagePackMediaType));
+		Assert.assertTrue("the converter should be able to write the class", converter.canWrite(CatWithProperties.class, messagePackMediaType));
 		Class<CatWithProperties> classToWrite = CatWithProperties.class;
 		HttpHeaders headers = Mockito.mock(HttpHeaders.class);
 		HttpOutputMessage httpOutputMessage = Mockito.mock(HttpOutputMessage.class);
