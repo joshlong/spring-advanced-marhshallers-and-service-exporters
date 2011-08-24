@@ -109,6 +109,8 @@ public class ThriftServiceExporter extends AbstractThriftExporter implements Ini
 			}
 			InputStream in = request.getInputStream();
 			OutputStream out = response.getOutputStream();
+
+			// this is not pluggable from this end
 			TTransport transport = new TIOStreamTransport(in, out);
 			TProtocol protocol = protocolFactory.getProtocol(transport );
 			processor.process(  protocol,protocol);

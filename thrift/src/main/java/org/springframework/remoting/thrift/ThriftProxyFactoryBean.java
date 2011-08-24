@@ -22,6 +22,7 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -47,8 +48,8 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 	// default protocol will be binary
 	private TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
 
-	// socket is optional
-	private TSocket socket;
+	// transport is optional
+	private TTransport transport;
 
 	// protocol is optional
 	private TProtocol protocol;
@@ -67,8 +68,8 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 		this.protocolFactory = inProtocolFactory;
 	}
 
-	public void setSocket(TSocket socket) {
-		this.socket = socket;
+	public void setTransport(TTransport transport) {
+		this.transport = transport;
 	}
 
 	public void setProtocol(TProtocol protocol) {
@@ -118,14 +119,14 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 		if (getServiceInterface() == null) {
 			throw new IllegalArgumentException("Property 'serviceInterface' is required");
 		}
-		if (this.socket == null) {
+		if (this.transport == null) {
 			Assert.notNull(this.host, "Property 'host' is required");
 			Assert.isTrue(this.port > 0, "Property 'port' is required and must be greater than 0");
-			this.socket = new TSocket(this.host, this.port);
+			this.transport = new TSocket(this.host, this.port);
 		}
 
 		if (this.protocol == null) {
-			this.protocol =  this.protocolFactory.getProtocol(this.socket);
+			this.protocol =  this.protocolFactory.getProtocol(this.transport);
 		}
 
 		try {
@@ -138,9 +139,10 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 			Constructor constructor = ClassUtils.getConstructorIfAvailable(clientClass, TProtocol.class);
 
 			this.client = constructor.newInstance(this.protocol);
+
 			Assert.notNull(this.client, "the Thrift RPC client was not correctly created. Aborting.");
 			this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy(getBeanClassLoader());
-			this.socket.open();
+			this.transport.open();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

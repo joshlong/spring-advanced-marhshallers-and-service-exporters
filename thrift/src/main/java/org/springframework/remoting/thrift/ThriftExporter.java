@@ -20,6 +20,7 @@ package org.springframework.remoting.thrift;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TServerTransport;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.thrift.util.ThriftUtil;
 import org.springframework.util.Assert;
@@ -37,7 +38,7 @@ public class ThriftExporter extends AbstractThriftExporter implements SmartLifec
 
 	private volatile boolean running = false;
 
-	private TServerSocket serverSocket;
+	private TServerTransport transport;
 
 	private TServer tServer;
 
@@ -45,8 +46,8 @@ public class ThriftExporter extends AbstractThriftExporter implements SmartLifec
 
 	private InetSocketAddress address;
 
-	public void setServerSocket(TServerSocket serverSocket) {
-		this.serverSocket = serverSocket;
+	public void setTransport(TServerTransport transport) {
+		this.transport = transport;
 	}
 
 	public void setServer(TServer s) {
@@ -88,20 +89,20 @@ public class ThriftExporter extends AbstractThriftExporter implements SmartLifec
 				logger.debug("starting " + ThriftExporter.class.getName() + ". This exporter's only been tested on Thrift 0.7. Your mileage may vary with other versions");
 			}
 
-			TServerSocket socket = this.serverSocket;
-			if (null == socket) {
+			TServerTransport serverTransport = this.transport;
+			if (null == serverTransport) { // ie, no transport specified
 				if (this.address != null) {
-					socket = new TServerSocket(this.address);
+					serverTransport = new TServerSocket(this.address);
 				} else {
-					socket = new TServerSocket(this.port);
+					serverTransport = new TServerSocket(this.port);
 				}
 			}
 
-			TThreadPoolServer.Args args = new TThreadPoolServer.Args(socket);
+			TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport);
 			args.processor(processor);
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("starting to listen on " + socket.getServerSocket().toString());
+				logger.debug("starting to listen on " + serverTransport.toString());
 			}
 
 			if (null == this.tServer) {

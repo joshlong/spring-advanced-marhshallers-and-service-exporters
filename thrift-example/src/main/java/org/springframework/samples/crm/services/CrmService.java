@@ -1,6 +1,8 @@
 package org.springframework.samples.crm.services;
 
+import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
+import org.springframework.thrift.crm.Crm;
 import org.springframework.thrift.crm.Customer;
 
 import java.util.Arrays;
@@ -8,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service("crm")
-public class CrmService {
+public class CrmService implements Crm.Iface {
 
 	private List<String> firstNames = Arrays.asList("Josh","Oliver", "Costin", "Juergen", "Rod", "Mark", "Dave", "Arjen", "Keith", "Adam", "Mike", "Mario");
 	private List<String> lastNames = Arrays.asList("Lee", "Loo", "Wi", "Li", "Humble", "Duong", "Kuo");
@@ -28,6 +30,11 @@ public class CrmService {
 
 	public Customer createCustomer(String fn, String ln, String email, int id) {
 		return new Customer(fn, ln, email, id);
+	}
+
+	@Override
+	public Customer createCustomer(String fn, String ln, String email) throws TException {
+	  return createCustomer(fn,ln,email, (int) (Math.random()  * 2002));
 	}
 
 	public Customer getCustomerById( int  customerId) {

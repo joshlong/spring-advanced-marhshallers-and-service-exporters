@@ -31,9 +31,9 @@ import java.util.Map;
  *
  * @author Josh Long
  */
-public class Main {
+public class RestClient {
 
-	static private Log log = LogFactory.getLog(Main.class);
+	static private Log log = LogFactory.getLog(RestClient.class);
 
 	@Configuration
 	@Import(CommonConfiguration.class)
@@ -73,17 +73,19 @@ public class Main {
 
 		Customer customer = client.getForEntity( url, Customer.class , mapOfVars).getBody();
 		log.info("response payload: " + ToStringBuilder.reflectionToString(customer));
-		client.execute(url, HttpMethod.GET, null, new ResponseExtractor<Object>() {
-			@Override
-			public Object extractData(ClientHttpResponse response) throws IOException {
-				debug("Response: ", response.getHeaders());
-				return null;
-			}
-		}, mapOfVars);
+		client.execute(url, HttpMethod.GET, null, new DebuggingResponseExtractor() , mapOfVars);
 	}
 
 	static String buildServiceUrl(String prefix) {
-		return "http://localhost:8080" + (prefix.startsWith("/") ? "" : "/") + prefix;
+		return "http://localhost:8080/rest/" + (prefix.startsWith("/") ? "" : "/")+ prefix;
+	}
+
+	static class DebuggingResponseExtractor implements ResponseExtractor<Object> {
+		@Override
+		public Object extractData(ClientHttpResponse response) throws IOException {
+				debug("Response: ", response.getHeaders());
+		 return null;
+		}
 	}
 
 	static void debug(String title, HttpHeaders headers) {

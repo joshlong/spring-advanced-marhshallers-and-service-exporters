@@ -14,7 +14,6 @@ public class CrmRestController {
 
 	static public final String acceptHeader = "Accept=application/json, application/xml, " + ThriftHttpMessageConverter.MEDIA_TYPE_STRING ;
 
-
 	@Inject
 	private CrmService crmService ;
 

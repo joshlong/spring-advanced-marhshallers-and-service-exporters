@@ -6,6 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.http.converter.thrift.ThriftHttpMessageConverter;
+import org.springframework.samples.crm.rest.CrmRestController;
+import org.springframework.samples.crm.services.CrmService;
 
 import java.util.Arrays;
 import java.util.List;

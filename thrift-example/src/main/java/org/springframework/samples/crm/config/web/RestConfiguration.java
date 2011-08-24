@@ -20,20 +20,25 @@ import java.util.List;
 @Configuration
 @Import(CommonConfiguration.class)
 @EnableWebMvc
-public class WebConfiguration extends WebMvcConfigurerAdapter {
+public class RestConfiguration extends WebMvcConfigurerAdapter {
 
-	@Inject private CommonConfiguration commonConfiguration ;
+	@Inject
+	private CommonConfiguration commonConfiguration;
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-
-		for(HttpMessageConverter<?> mc : commonConfiguration.messageConverters())
+		for (HttpMessageConverter<?> mc : commonConfiguration.messageConverters()) {
 			converters.add(mc);
+		}
 	}
-	@Bean public CrmService crmService (){
+
+	@Bean
+	public CrmService crmService() {
 		return new CrmService();
 	}
-	@Bean public CrmRestController controller (){
+
+	@Bean
+	public CrmRestController controller() {
 		return new CrmRestController();
 	}
 
