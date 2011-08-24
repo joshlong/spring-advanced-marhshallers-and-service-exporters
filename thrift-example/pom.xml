@@ -20,32 +20,32 @@
     <dependencies>
 
 
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${org.springframework-version}</version>
-            </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
 
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
-                <version>${org.springframework-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>${org.springframework-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>${org.springframework-version}</version>
-            </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
 
 
         <dependency>
@@ -89,7 +89,6 @@
         </dependency>
 
 
-
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -105,7 +104,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${org.slf4j-version}</version>
-         </dependency>
+        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -157,11 +156,11 @@
             <artifactId>hibernate-validator</artifactId>
             <version>4.1.0.Final</version>
         </dependency>
-           <dependency>
-                <groupId>com.joshlong.marshallers</groupId>
-                <artifactId>thrift</artifactId>
-                <version>1.0.0-BUILD-SNAPSHOT</version>
-            </dependency>
+        <dependency>
+            <groupId>com.joshlong.marshallers</groupId>
+            <artifactId>thrift</artifactId>
+            <version>1.0.0-BUILD-SNAPSHOT</version>
+        </dependency>
         <!--  Joda Time -->
         <dependency>
             <groupId>joda-time</groupId>
@@ -177,7 +176,7 @@
 
     </dependencies>
     <repositories>
-     <repository>
+        <repository>
             <id>org.springframework.maven.snapshot</id>
             <name>Spring Maven Snapshot Repository</name>
             <url>http://maven.springframework.org/snapshot</url>
@@ -188,7 +187,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-         <repository>
+        <repository>
             <id>org.springframework.maven.milestone</id>
             <name>Spring Maven Milestone Repository</name>
             <url>http://maven.springframework.org/milestone</url>

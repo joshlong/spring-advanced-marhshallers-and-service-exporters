@@ -20,8 +20,6 @@
     </servlet>
 
 
-
-
     <servlet-mapping>
         <servlet-name>crmHttp</servlet-name>
         <url-pattern>/http/*</url-pattern>

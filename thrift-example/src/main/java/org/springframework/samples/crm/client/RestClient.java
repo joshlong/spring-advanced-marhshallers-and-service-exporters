@@ -1,3 +1,19 @@
+/*
+ * Copyright 2002-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.samples.crm.client;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -42,14 +58,14 @@ public class RestClient {
 		@Inject private CommonConfiguration commonConfiguration;
 
 		private ClientHttpRequestInterceptor[] requestInterceptors = {
-			 new ClientHttpRequestInterceptor() {
-				 @Override
-				 public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-					 request.getHeaders().setAccept(Arrays.asList(ThriftHttpMessageConverter.MEDIA_TYPE));
-					 debug("Request: ", request.getHeaders());
-					 return execution.execute(request, body);
-				 }
-			 }
+				                                                             new ClientHttpRequestInterceptor() {
+					                                                             @Override
+					                                                             public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+						                                                             request.getHeaders().setAccept(Arrays.asList(ThriftHttpMessageConverter.MEDIA_TYPE));
+						                                                             debug("Request: ", request.getHeaders());
+						                                                             return execution.execute(request, body);
+					                                                             }
+				                                                             }
 		};
 
 		@Bean
@@ -71,27 +87,27 @@ public class RestClient {
 		Map<String, Object> mapOfVars = new HashMap<String, Object>();
 		mapOfVars.put("customerId", 3);
 
-		Customer customer = client.getForEntity( url, Customer.class , mapOfVars).getBody();
+		Customer customer = client.getForEntity(url, Customer.class, mapOfVars).getBody();
 		log.info("response payload: " + ToStringBuilder.reflectionToString(customer));
-		client.execute(url, HttpMethod.GET, null, new DebuggingResponseExtractor() , mapOfVars);
+		client.execute(url, HttpMethod.GET, null, new DebuggingResponseExtractor(), mapOfVars);
 	}
 
 	static String buildServiceUrl(String prefix) {
-		return "http://localhost:8080/rest/" + (prefix.startsWith("/") ? "" : "/")+ prefix;
+		return "http://localhost:8080/rest/" + (prefix.startsWith("/") ? "" : "/") + prefix;
 	}
 
 	static class DebuggingResponseExtractor implements ResponseExtractor<Object> {
 		@Override
 		public Object extractData(ClientHttpResponse response) throws IOException {
-				debug("Response: ", response.getHeaders());
-		 return null;
+			debug("Response: ", response.getHeaders());
+			return null;
 		}
 	}
 
 	static void debug(String title, HttpHeaders headers) {
 		System.out.println("============== " + title + " ==============");
 		for (String k : headers.keySet()) {
-			System.out.println(String.format("%s = %s", k, headers.get(k)))  ;
+			System.out.println(String.format("%s = %s", k, headers.get(k)));
 		}
 	}
 
