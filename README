@@ -1,5 +1,21 @@
-http://www.schnada.de/grapt/eriknaggum-xmlrant.html
-http://www.reddit.com/r/programming/comments/eaqgk
+the spring framework has long supported a consistant raft of RPC mechanisms
+with its Service Exporters. As of Spring 3.0, it's also provided a nice SPI
+to support arbitrary serializers (marshallers, or, more properly,
+HttpMessageConverters) in the REST support provided by the framework.
+
+Both of these mechanisms are powerful, and expose flexible SPIs that can be
+used to teach Spring new tricks.
+
+This is particularly valuable in the world of serializers and RPC
+mechanisms, which tend to move much quicker than individual Spring framework
+releases. For example, Cassandra (itself only a 0.7 project!) has already
+had a full integration with Thrift and has now moved on to support Avro.
+Ex-Googler Dhanji Prasana called (http://rethrick.com/#waving-goodbye) Google's
+Protocol Buffers (which Google's used over a few iterations for years) an
+"ancient, creaking dinosaurs" compared to MessagePack, JSON, and Hadoop. 
+
+So, understanding that the space is too voilatile to try to track in Spring
+proper, I've started building these implementations.
 
 todo:
  the support defined here should work for:
@@ -7,3 +23,16 @@ todo:
   -- HttpMessageConverters (REST serialization)
   -- JMS MessageConverters
   -- AMQP MessageConverters
+
+ serialization technologies to support include: 
+  -- Avro
+  -- Thrift
+  -- MessagePack
+  -- Google Protocol Buffers 
+
+ RPC technologies include 
+  -- JBoss Remoting
+  -- MessagePack RPC
+  -- Thrift RPC 
+  -- Avro 
+  -- Netty? 
