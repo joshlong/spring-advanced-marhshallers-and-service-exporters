@@ -20,6 +20,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TSocket;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -33,12 +34,18 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
- * Provides the client-side of the equation to connect to
- * Thrift RPC services.
+ * Builds proxies that can connect to a Thrift RPC service.
+ *
+ * <P>Thrift clients will by default
+ * use the Thrift binary protocol unless the {@link #protocolFactory} is overridden.
  *
  * @author Josh Long
+ * @see org.springframework.remoting.caucho.HessianProxyFactoryBean
  */
 public class ThriftProxyFactoryBean extends RemoteAccessor implements InitializingBean, MethodInterceptor, FactoryBean<Object> {
+
+	// default protocol will be binary
+	private TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
 
 	// socket is optional
 	private TSocket socket;
@@ -55,6 +62,43 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 	private String host = "127.0.0.1";
 
 	private int port = ThriftUtil.DEFAULT_PORT;
+
+	public void setProtocolFactory(TProtocolFactory inProtocolFactory) {
+		this.protocolFactory = inProtocolFactory;
+	}
+
+	public void setSocket(TSocket socket) {
+		this.socket = socket;
+	}
+
+	public void setProtocol(TProtocol protocol) {
+		this.protocol = protocol;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	@Override
+	public void setServiceInterface(Class serviceInterface) {
+		super.setServiceInterface(ThriftUtil.buildServiceInterface(serviceInterface));
+	}
+
+	public Object getObject() {
+		return this.serviceProxy;
+	}
+
+	public Class<?> getObjectType() {
+		return getServiceInterface();
+	}
+
+	public boolean isSingleton() {
+		return true;
+	}
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -81,7 +125,7 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 		}
 
 		if (this.protocol == null) {
-			this.protocol = new TBinaryProtocol(this.socket);
+			this.protocol =  this.protocolFactory.getProtocol(this.socket);
 		}
 
 		try {
@@ -102,37 +146,5 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 		}
 	}
 
-	@Override
-	public void setServiceInterface(Class serviceInterface) {
-		super.setServiceInterface(ThriftUtil.buildServiceInterface(serviceInterface));
-	}
-
-	public Object getObject() {
-		return this.serviceProxy;
-	}
-
-	public Class<?> getObjectType() {
-		return getServiceInterface();
-	}
-
-	public boolean isSingleton() {
-		return true;
-	}
-
-	public void setSocket(TSocket socket) {
-		this.socket = socket;
-	}
-
-	public void setProtocol(TProtocol protocol) {
-		this.protocol = protocol;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
 
 }

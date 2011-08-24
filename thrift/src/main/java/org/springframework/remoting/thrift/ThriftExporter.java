@@ -17,82 +17,65 @@
 
 package org.springframework.remoting.thrift;
 
-import org.apache.thrift.TProcessor;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.thrift.util.ThriftUtil;
 import org.springframework.util.Assert;
 
 import java.net.InetSocketAddress;
 
 /**
- * Exports Thrift based RPC services. Requires for the {@link #serviceInterface} property
- * a reference to the IFace class inside the Thrift generated class, e.g., {@code Foo.IFace.class}.
- *
- * The {@link #service} itself is any POJO, but that POJO must implement the {@link #serviceInterface}.
+ * <P> Exports Thrift based RPC services. This implementation will expose the Thrift based POJO on the
+ * {@link #port} specified (or, alternatively, the {@link #address})
  *
  * @author Josh Long
+ * @see org.springframework.remoting.caucho.HessianExporter
  */
-public class ThriftExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
-
-	private Class thriftClass;
-
-	private TServer tServer;
+public class ThriftExporter extends AbstractThriftExporter implements SmartLifecycle {
 
 	private volatile boolean running = false;
 
-	private TProcessor processor;
+	private TServerSocket serverSocket;
 
-	private int listenPort = ThriftUtil.DEFAULT_PORT;
+	private TServer tServer;
+
+	private int port = ThriftUtil.DEFAULT_PORT;
 
 	private InetSocketAddress address;
 
-	public void setListenPort(int listenPort) {
-		this.listenPort = listenPort;
+	public void setServerSocket(TServerSocket serverSocket) {
+		this.serverSocket = serverSocket;
+	}
+
+	public void setServer(TServer s) {
+		this.tServer = s;
+	}
+
+	public void setPort(int listenPort) {
+		Assert.isTrue(listenPort > 0, "the port must be a value greater than 0");
+		this.port = listenPort;
 	}
 
 	public void setAddress(InetSocketAddress address) {
+		Assert.notNull(address, "you have specified a null address");
 		this.address = address;
 	}
-
-
-	@Override
-	public void setServiceInterface(Class serviceInterface) {
-		super.setServiceInterface(ThriftUtil.buildServiceInterface(serviceInterface));
-		this.thriftClass = getServiceInterface().getEnclosingClass();
-		Assert.notNull(this.thriftClass, "the 'thriftClass' can't be null");
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Class serviceInterface = getServiceInterface();
-		Object service = getService();
-
-		Assert.notNull(service, "the service must not be null");
-		Assert.notNull(serviceInterface, "the serviceInterface must not be null");
-		Assert.isTrue(serviceInterface.isAssignableFrom(service.getClass()));
-
-		this.processor = ThriftUtil.buildProcessor(thriftClass, getServiceInterface(), getService());
-
-	}
-
 
 	@Override
 	public boolean isAutoStartup() {
 		return true;
 	}
 
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
 
 	@Override
-	public void stop(Runnable callback) {
-		stop();
-		if (callback != null) {
-			callback.run();
-		}
+	public int getPhase() {
+		return 0;
 	}
 
 	@Override
@@ -105,12 +88,15 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 				logger.debug("starting " + ThriftExporter.class.getName() + ". This exporter's only been tested on Thrift 0.7. Your mileage may vary with other versions");
 			}
 
-			TServerSocket socket = null;
-			if (this.address != null) {
-				socket = new TServerSocket(this.address);
-			} else {
-				socket = new TServerSocket(this.listenPort);
+			TServerSocket socket = this.serverSocket;
+			if (null == socket) {
+				if (this.address != null) {
+					socket = new TServerSocket(this.address);
+				} else {
+					socket = new TServerSocket(this.port);
+				}
 			}
+
 			TThreadPoolServer.Args args = new TThreadPoolServer.Args(socket);
 			args.processor(processor);
 
@@ -118,7 +104,9 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 				logger.debug("starting to listen on " + socket.getServerSocket().toString());
 			}
 
-			tServer = new TThreadPoolServer(args);
+			if (null == this.tServer) {
+				tServer = new TThreadPoolServer(args);
+			}
 			tServer.serve();
 
 		} catch (Exception e) {
@@ -134,13 +122,13 @@ public class ThriftExporter extends RemoteInvocationBasedExporter implements Ini
 		this.running = false;
 	}
 
-	@Override
-	public boolean isRunning() {
-		return running;
-	}
 
 	@Override
-	public int getPhase() {
-		return 0;
+	public void stop(Runnable callback) {
+		stop();
+		if (callback != null) {
+			callback.run();
+		}
 	}
+
 }
