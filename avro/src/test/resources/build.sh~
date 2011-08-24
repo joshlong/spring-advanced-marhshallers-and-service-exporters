@@ -1,0 +1,1 @@
+thrift --gen java:java5 -o ../java/
