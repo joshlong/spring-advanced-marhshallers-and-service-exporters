@@ -52,8 +52,9 @@ public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Objec
 			Schema s = new SchemaFactoryBean(clazz).getObject();
 			boolean supports = s != null;
 
-			if(logger.isDebugEnabled())
-			logger.debug("returning " + supports + " for class " + clazz.getName());
+			if (logger.isDebugEnabled()) {
+				logger.debug("returning " + supports + " for class " + clazz.getName());
+			}
 
 			return supports;
 		} catch (Exception e) {
@@ -115,7 +116,6 @@ public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Objec
 					                  .build();
 			writer.write(obj, encoder);
 			encoder.flush();
-//			outputMessage.getBody().flush();
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("exception when trying to test whether the class " + obj.getClass().getName() + " has an Avro schema");

@@ -27,9 +27,10 @@ public class SchemaFactoryBean implements FactoryBean<Schema>, InitializingBean 
 	private Resource location;
 	private volatile boolean setup = false;
 
-	private Class  targetClass;
+	private Class targetClass;
 
 	private final Object lock = new Object();
+
 	/**
 	 * <p/>
 	 * first attempts to consult the registry of known types ({@link SpecificData}). This registry specifically
@@ -78,7 +79,7 @@ public class SchemaFactoryBean implements FactoryBean<Schema>, InitializingBean 
 	 * @param c
 	 */
 	public SchemaFactoryBean(Class c) {
-	 this.result = findSchemaFor(c) ;
+		this.result = findSchemaFor(c);
 	}
 
 	/**
@@ -97,7 +98,6 @@ public class SchemaFactoryBean implements FactoryBean<Schema>, InitializingBean 
 		}
 
 	}
-
 
 
 	/**

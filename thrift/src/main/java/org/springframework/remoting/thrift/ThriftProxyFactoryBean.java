@@ -43,7 +43,7 @@ import java.lang.reflect.Method;
  * @author Josh Long
  * @see org.springframework.remoting.caucho.HessianProxyFactoryBean
  */
-public class ThriftProxyFactoryBean extends RemoteAccessor implements InitializingBean, MethodInterceptor, FactoryBean<Object> {
+public class ThriftProxyFactoryBean <T>  extends RemoteAccessor implements InitializingBean, MethodInterceptor, FactoryBean<T> {
 
 	// default protocol will be binary
 	private TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
@@ -89,8 +89,8 @@ public class ThriftProxyFactoryBean extends RemoteAccessor implements Initializi
 		super.setServiceInterface(ThriftUtil.buildServiceInterface(serviceInterface));
 	}
 
-	public Object getObject() {
-		return this.serviceProxy;
+	public T getObject() {
+		return (T) this.serviceProxy;
 	}
 
 	public Class<?> getObjectType() {

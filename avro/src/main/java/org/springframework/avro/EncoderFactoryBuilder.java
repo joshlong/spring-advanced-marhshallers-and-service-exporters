@@ -55,7 +55,7 @@ public class EncoderFactoryBuilder {
 			encoder = encoderFactory.binaryEncoder(this.outputStream, (BinaryEncoder) reuse);
 		} else if (useJson) {
 			Assert.notNull(this.outputStream, "you've selected to use a JSON encoder. Please provide an output stream to encode to by setting the 'outputStream' property");
-			encoder = encoderFactory.jsonEncoder(this.schema, this.outputStream) ;
+			encoder = encoderFactory.jsonEncoder(this.schema, this.outputStream);
 		}
 		Assert.notNull(encoder, "could not build an encoder. Did you set both 'useJson' and 'useBinary' to false?");
 		if (validate) {

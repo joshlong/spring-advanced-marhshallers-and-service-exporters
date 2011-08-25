@@ -24,13 +24,12 @@ import org.springframework.util.ClassUtils;
 
 public class Client {
 	static public void main(String args[]) throws Throwable {
-		ThriftProxyFactoryBean client = new ThriftProxyFactoryBean();
+		ThriftProxyFactoryBean <Crm.Iface> client = new ThriftProxyFactoryBean<Crm.Iface>();
 		client.setBeanClassLoader(ClassUtils.getDefaultClassLoader());
-		client.setServiceInterface(Crm.class);
+		client.setServiceInterface(Crm.Iface.class);
 		client.afterPropertiesSet();
-		Object proxy = client.getObject();
-		Crm.Iface clientProxy = (Crm.Iface) proxy;
-		Customer customer = clientProxy.createCustomer("josh", "Long", "josh.long@email.com");
+		Crm.Iface proxy = client.getObject();
+		Customer customer = proxy.createCustomer("josh", "Long", "josh.long@email.com");
 		System.out.println(ToStringBuilder.reflectionToString(customer));
 	}
 }

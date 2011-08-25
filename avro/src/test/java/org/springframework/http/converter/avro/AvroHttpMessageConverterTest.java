@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.http.converter.avro;
 
 import junit.framework.Assert;
@@ -54,8 +69,8 @@ public class AvroHttpMessageConverterTest {
 
 	@Test
 	public void testHttpWriting() throws Throwable {
-		boolean canWrite  = messageConverter.canWrite(Customer.class, mediaType);
-		Assert.assertTrue("the converter should be able to read the class",canWrite );
+		boolean canWrite = messageConverter.canWrite(Customer.class, mediaType);
+		Assert.assertTrue("the converter should be able to read the class", canWrite);
 		HttpHeaders headers = Mockito.mock(HttpHeaders.class);
 		HttpOutputMessage httpOutputMessage = Mockito.mock(HttpOutputMessage.class);
 		Mockito.when(httpOutputMessage.getHeaders()).thenReturn(headers);
@@ -94,14 +109,14 @@ public class AvroHttpMessageConverterTest {
 		ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 		Schema s = new SchemaFactoryBean(obj.getClass()).getObject();
 		Encoder e = new EncoderFactoryBuilder().
-							   setOutputStream(arrayOutputStream)
+				                                       setOutputStream(arrayOutputStream)
 				            .setSchema(s)
 				            .build();
 
 		GenericDatumWriter writer = new GenericDatumWriter();
 		writer.setSchema(s);
 		writer.write(obj, e);
-	    e.flush();
+		e.flush();
 		arrayOutputStream.flush();
 		byte[] bytes = arrayOutputStream.toByteArray();
 		return new ByteArrayInputStream(bytes);

@@ -58,9 +58,9 @@ public class DecoderFactoryBuilder {
 
 
 	protected Decoder buildThreadAwareDecoder() throws Exception {
-		Decoder existingDecoder = decoderThreadLocal.get() ;
-		decoderThreadLocal.set(build( existingDecoder ));
-		return decoderThreadLocal.get() ;
+		Decoder existingDecoder = decoderThreadLocal.get();
+		decoderThreadLocal.set(build(existingDecoder));
+		return decoderThreadLocal.get();
 	}
 
 	protected Decoder build(Decoder reuse) throws Exception {
@@ -81,15 +81,15 @@ public class DecoderFactoryBuilder {
 
 		Assert.notNull(decoder, "could not build a decoder. Did you set both 'useJson' and 'userBinary' to false?");
 
-		if(validate){
+		if (validate) {
 			Assert.notNull(this.schema, "you've selected to validate. Please provide a target schema by setting the 'schema' property");
-			decoder =decoderFactory.validatingDecoder( this.schema, decoder);
+			decoder = decoderFactory.validatingDecoder(this.schema, decoder);
 		}
-		return decoder ;
+		return decoder;
 	}
 
-	public Decoder build() throws Exception{
-		return buildThreadAwareDecoder() ;
+	public Decoder build() throws Exception {
+		return buildThreadAwareDecoder();
 	}
 
 }
