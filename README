@@ -36,3 +36,11 @@ todo:
   -- Thrift RPC 
   -- Avro 
   -- Netty? 
+
+Approach
+New Note 5
+
+Build Spring OBM -- object-to-binary marshallers. this would let you then
+build ONE JMS MessageConverter and ONE AMQP MessageConverter and ONE
+HttpMessageConverter and then delegate to the object-to-binary marshaller
+and unmarshaller, a la Spring OXM
