@@ -1,36 +1,12 @@
-/*
- * Copyright 2011 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.springframework.remoting.avro;
 
 import org.apache.avro.ipc.Responder;
 import org.apache.avro.ipc.specific.SpecificResponder;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteExporter;
 
-/**
- * <p>Provides convenience 'getter' to retrieve the constructed {@link Responder}  </p>
- *
- * @author Josh Long
- */
-abstract public class AbstractAvroExporter extends RemoteExporter implements InitializingBean {
-	public Responder getResponder() {
-		return new SpecificResponder(getServiceInterface(), getService());
-	}
+public class AbstractAvroExporter extends RemoteExporter  {
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	protected Responder getResponder() {
+		return new SpecificResponder(getServiceInterface(), getService());
 	}
 }

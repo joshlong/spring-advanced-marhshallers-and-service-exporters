@@ -17,12 +17,13 @@ package org.springframework.remoting.avro;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.avro.ipc.NettyTransceiver;
 import org.apache.avro.ipc.Transceiver;
 import org.apache.avro.ipc.specific.SpecificRequestor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.remoting.avro.clients.NettyTransceiverCreationCallback;
+import org.springframework.remoting.avro.clients.TransceiverCreationCallback;
 import org.springframework.remoting.support.RemoteAccessor;
 import org.springframework.util.Assert;
 
@@ -30,18 +31,22 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 
 /**
- * {@link org.springframework.beans.factory.FactoryBean} that builds serviceProxy-side proxies that
- * in turn talk
+ * {@link org.springframework.beans.factory.FactoryBean} that builds client-side proxies that
+ * in turn talk to remote Avro RPC implementations
  *
  * @author Josh Long
+ * @see org.springframework.remoting.avro.clients.TransceiverCreationCallback
  */
 public class AvroProxyFactoryBean<T> extends RemoteAccessor implements InitializingBean, MethodInterceptor, FactoryBean<T> {
 
+	private TransceiverCreationCallback transceiverCreationCallback;
+
 	private int port = 2003;
+
 	private Transceiver transceiver;
 	private Object serviceProxy;
-
 	private InetSocketAddress address;
+
 	private Object client;
 
 	public void setPort(int port) {
@@ -67,14 +72,28 @@ public class AvroProxyFactoryBean<T> extends RemoteAccessor implements Initializ
 		return true;
 	}
 
+	/**
+	 * <p>  Useful if you want to tailor the creation of the {@link Transceiver } that's used to handle the client side networking.</p>
+	 *
+	 * <p> This is not a required field because, by default, the implementation uses {@link NettyTransceiverCreationCallback} </p>
+	 *
+	 * @param transceiverCreationCallback the transceiver creation callback
+	 */
+	public void setTransceiverCreationCallback(TransceiverCreationCallback transceiverCreationCallback) {
+		this.transceiverCreationCallback = transceiverCreationCallback;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (null == address) {
-			address = new InetSocketAddress(port);
+		if (null == this.address) {
+			Assert.isTrue(this.port > 0, "the port must be greater than 0");
+			this.address = new InetSocketAddress(port);
 		}
-		if (transceiver == null) {
-			Assert.isTrue(port > 0, "the port must be greater than 0");
-			transceiver = new NettyTransceiver(address);
+		if (this.transceiverCreationCallback == null) {
+			this.transceiverCreationCallback = new NettyTransceiverCreationCallback();
+		}
+		if (this.transceiver == null) {
+			this.transceiver = transceiverCreationCallback.buildTransceiver(this.address);
 		}
 		this.client = SpecificRequestor.getClient(getServiceInterface(), transceiver);
 		Assert.notNull(client, "we weren't able to build a serviceProxy");
@@ -83,7 +102,7 @@ public class AvroProxyFactoryBean<T> extends RemoteAccessor implements Initializ
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		// now, unless i miss my mark, the interface of this proxy and the proxy weve created locally are the same,
+		// now, unless i miss my mark, the interface of this proxy and the proxy we've created locally are the same,
 		// so it should be a simple matter to forward the MethodInvocation on to the local serviceProxy
 		Method method = invocation.getMethod();
 
@@ -93,4 +112,6 @@ public class AvroProxyFactoryBean<T> extends RemoteAccessor implements Initializ
 
 		return method.invoke(this.client, invocation.getArguments());
 	}
+
+
 }
