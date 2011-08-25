@@ -158,9 +158,9 @@
                             <goal>idl-protocol</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                            <sourceDirectory>${project.basedir}/src/main/resources/</sourceDirectory>
                             <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
-                            <testSourceDirectory>${project.basedir}/src/test/avro/</testSourceDirectory>
+                            <testSourceDirectory>${project.basedir}/src/test/resources/</testSourceDirectory>
                             <testOutputDirectory>${project.basedir}/src/test/java/</testOutputDirectory>
                         </configuration>
                     </execution>

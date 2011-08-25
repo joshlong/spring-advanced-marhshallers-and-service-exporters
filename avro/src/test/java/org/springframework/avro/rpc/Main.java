@@ -23,6 +23,8 @@ import java.util.Random;
  */
 public class Main {
 
+
+
 	static class MyCrm implements Crm {
 
 		static private Random randomIdGenerator = new Random();
