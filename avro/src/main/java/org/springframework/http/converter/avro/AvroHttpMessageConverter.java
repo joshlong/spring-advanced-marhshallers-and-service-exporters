@@ -3,7 +3,11 @@ package org.springframework.http.converter.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
-import org.springframework.beans.factory.InitializingBean;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.Encoder;
+import org.springframework.avro.DecoderFactoryBuilder;
+import org.springframework.avro.EncoderFactoryBuilder;
+import org.springframework.avro.SchemaFactoryBean;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -23,28 +27,101 @@ import java.util.Arrays;
  * @see org.springframework.http.converter.HttpMessageConverter
  * @see org.springframework.web.client.RestTemplate
  */
-public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Object> implements InitializingBean {
+public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
 	public static final String MEDIA_TYPE_STRING = "application/x-avro";
 
 	public static final MediaType MEDIA_TYPE = new MediaType("application", "x-avro");
 
-	private Schema writerSchema;
-	private Schema readerSchema;
-	private GenericDatumWriter writer;
-	private GenericDatumReader reader;
-	private Schema schema;
+	private boolean validate = false;
 
-	public void setReaderSchema(Schema readerSchema) {
-		this.readerSchema = readerSchema;
+	/**
+	 * dictates whether the {@link org.apache.avro.io.Encoder encoders} and {@link Decoder decoders} will
+	 * be wrapped in a {@link org.apache.avro.io.ValidatingDecoder} or {@link org.apache.avro.io.ValidatingEncoder}
+	 *
+	 * @param validate whether or not to validate
+	 */
+	public void setValidate(boolean validate) {
+		this.validate = validate;
 	}
 
-	public void setWriterSchema(Schema writerSchema) {
-		this.writerSchema = writerSchema;
+	@Override
+	protected boolean supports(Class<?> clazz) {
+		try {
+			Assert.notNull(clazz, "the class must not be null");
+			Schema s = new SchemaFactoryBean(clazz).getObject();
+			boolean supports = s != null;
+
+			if(logger.isDebugEnabled())
+			logger.debug("returning " + supports + " for class " + clazz.getName());
+
+			return supports;
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
+			}
+			return false;
+		}
 	}
 
-	public void setSchema(Schema schema) {
-		this.schema = schema;
+	@Override
+	protected Object readInternal(Class<? extends Object> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+		try {
+
+			Assert.notNull(clazz, "the class must not be null");
+
+			Schema schema = new SchemaFactoryBean(clazz).getObject();
+			Assert.notNull(schema, "the schema must not be null");
+
+			GenericDatumReader reader = new GenericDatumReader(schema);
+
+			Object old = clazz.newInstance();
+
+			Decoder decoder = new DecoderFactoryBuilder()
+					                  .setInputStream(inputMessage.getBody())
+					                  .setUseBinary(true)
+					                  .setSchema(schema)
+					                  .setValidate(this.validate)
+					                  .build();
+
+			return reader.read(old, decoder);
+
+
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
+			}
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	protected void writeInternal(Object obj, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+		try {
+
+			Assert.notNull(obj, "the object to encode must not be null");
+
+			Schema schema = new SchemaFactoryBean(obj.getClass()).getObject();
+			Assert.notNull(schema, "the schema must not be null");
+
+			GenericDatumWriter writer = new GenericDatumWriter(schema);
+
+
+			Encoder encoder = new EncoderFactoryBuilder()
+					                  .setOutputStream(outputMessage.getBody())
+					                  .setSchema(schema)
+					                  .setUseBinary(true)
+					                  .setValidate(this.validate)
+					                  .build();
+			writer.write(obj, encoder);
+			encoder.flush();
+//			outputMessage.getBody().flush();
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("exception when trying to test whether the class " + obj.getClass().getName() + " has an Avro schema");
+			}
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -62,45 +139,4 @@ public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Objec
 		super(supportedMediaTypes);
 	}
 
-	@Override
-	protected boolean supports(Class<?> clazz) {
-		return true;
-	}
-
-	@Override
-	protected Object readInternal(Class<? extends Object> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
-		return null;
-	}
-
-	@Override
-	protected void writeInternal(Object o, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-
-		// ok, only a couple of conditions are acceptable
-		if (this.writerSchema != null) {
-			Assert.isNull(this.schema, "the 'schema' must be null if you've selected a 'writerSchema'");
-		}
-		if (this.readerSchema != null) {
-			Assert.isNull(this.schema, "the 'schema' must be null if you've selected a 'readerSchema'");
-		}
-		if (schema != null) {
-			Assert.isTrue(this.readerSchema == null && this.writerSchema == null,
-					             "you must either select a single 'schema,' or specify " +
-								 "a 'readerSchema' and a 'writerSchema.' If the 'readerSchema' and 'writerSchema' schema " +
-								 "are the same, then simply specify the 'schema' property");
-			this.readerSchema = schema;
-			this.writerSchema = schema;
-		}
-
-
-		Assert.notNull(this.writerSchema, "the 'writerSchema' must not be null");
-		Assert.notNull(this.readerSchema, "the 'readerSchema' must not be null");
-
-		writer = new GenericDatumWriter(this.writerSchema);
-		reader = new GenericDatumReader(this.readerSchema);
-
-	}
 }
