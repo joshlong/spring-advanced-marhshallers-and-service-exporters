@@ -1,4 +1,4 @@
-package org.org.springframework.obm;
+package org.springframework.obm;
 
 
 import org.springframework.oxm.XmlMappingException;
