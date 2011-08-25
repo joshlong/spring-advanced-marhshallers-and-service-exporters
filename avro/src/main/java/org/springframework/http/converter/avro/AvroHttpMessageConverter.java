@@ -29,9 +29,9 @@ import java.util.Arrays;
  */
 public class AvroHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-	public static final String MEDIA_TYPE_STRING = "application/x-avro";
+	public static final String MEDIA_TYPE_STRING = "avro/binary";
 
-	public static final MediaType MEDIA_TYPE = new MediaType("application", "x-avro");
+	public static final MediaType MEDIA_TYPE = new MediaType("avro", "binary");
 
 	private boolean validate = false;
 

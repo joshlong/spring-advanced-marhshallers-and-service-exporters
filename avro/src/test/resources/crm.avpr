@@ -1,6 +1,6 @@
 {
     "namespace" : "org.springframework.avro.crm",
-    "protocol" : "Crm",
+    "saslProtocol" : "Crm",
     "types" : [
         {
             "name" : "Customer", "type": "record",
