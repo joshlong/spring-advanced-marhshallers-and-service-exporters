@@ -14,7 +14,11 @@
     </properties>
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>com.joshlong.marshallers</groupId>
+                <artifactId>core</artifactId>
+                <version>1.0.0-BUILD-SNAPSHOT</version>
+            </dependency>
             <!-- avro -->
             <dependency>
                 <groupId>org.apache.avro</groupId>
@@ -79,10 +83,10 @@
             <artifactId>avro-maven-plugin</artifactId>
             <version>${avro.version}</version>
         </dependency>
-          <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-oxm</artifactId>
-            </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+        </dependency>
         <!-- avro -->
         <dependency>
             <groupId>org.apache.avro</groupId>
