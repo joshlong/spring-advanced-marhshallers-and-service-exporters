@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.springframework.remoting.avro;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.avro.ipc.SaslSocketTransceiver;
+import org.apache.avro.ipc.NettyTransceiver;
 import org.apache.avro.ipc.Transceiver;
 import org.apache.avro.ipc.specific.SpecificRequestor;
 import org.springframework.aop.framework.ProxyFactory;
@@ -41,6 +41,7 @@ public class AvroProxyFactoryBean<T> extends RemoteAccessor implements Initializ
 	private Transceiver transceiver;
 	private Object serviceProxy;
 
+	private InetSocketAddress address;
 	private Object client;
 
 	public void setPort(int port) {
@@ -68,9 +69,12 @@ public class AvroProxyFactoryBean<T> extends RemoteAccessor implements Initializ
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		if (null == address) {
+			address = new InetSocketAddress(port);
+		}
 		if (transceiver == null) {
 			Assert.isTrue(port > 0, "the port must be greater than 0");
-			transceiver = new SaslSocketTransceiver(new InetSocketAddress(port));
+			transceiver = new NettyTransceiver(address);
 		}
 		this.client = SpecificRequestor.getClient(getServiceInterface(), transceiver);
 		Assert.notNull(client, "we weren't able to build a serviceProxy");

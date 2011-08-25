@@ -15,22 +15,21 @@
  */
 package org.springframework.remoting.avro;
 
+import org.apache.avro.ipc.NettyServer;
 import org.apache.avro.ipc.Responder;
-import org.apache.avro.ipc.specific.SpecificResponder;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.remoting.support.RemoteExporter;
+import org.apache.avro.ipc.Server;
 
 /**
- * <p>Provides convenience 'getter' to retrieve the constructed {@link Responder}  </p>
+ * <p/>
+ * implementation of {@link AbstractAvroServerExporter} that builds a {@link NettyServer}.
+ * <p/>
+ * This should be your default choice to expose services in the {@link AbstractAvroServerExporter} tree.
  *
  * @author Josh Long
  */
-abstract public class AbstractAvroExporter extends RemoteExporter implements InitializingBean {
-	public Responder getResponder() {
-		return new SpecificResponder(getServiceInterface(), getService());
-	}
-
+public class AvroNettyServerExporter extends AbstractAvroServerExporter {
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	protected Server buildServer(Responder responder) throws Exception {
+		return new NettyServer(responder, this.inetSocketAddress);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,8 @@ abstract public class AbstractAvroServerExporter extends AbstractAvroExporter im
 		}
 	}
 
-	 protected void onInit() throws Exception{}
+	protected void onInit() throws Exception {
+	}
 
 	/**
 	 * Each subclass can provider their own {@link Server} implementation
