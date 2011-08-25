@@ -17,13 +17,16 @@ package org.springframework.http.converter.avro;
 
 import junit.framework.Assert;
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.io.Decoder;
 import org.apache.avro.io.Encoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.avro.DecoderFactoryBuilder;
 import org.springframework.avro.EncoderFactoryBuilder;
 import org.springframework.avro.SchemaFactoryBean;
 import org.springframework.avro.crm.Customer;
@@ -84,12 +87,16 @@ public class AvroHttpMessageConverterTest {
 		// now we have the bytes of the customer
 		byte[] bytesWritten = byteArrayOutputStream.toByteArray();
 		Customer readCustomer = new Customer();
-		// lets 'restore' the bytes to a customer object
+		Schema s = new SchemaFactoryBean(Customer.class).getObject();
+		Decoder decoder = new DecoderFactoryBuilder()
+				.setInputStream(new ByteArrayInputStream(bytesWritten))
+				.setSchema(s)
+				.build() ;
 
-//
-
-//		deserializer.deserialize(readCustomer, bytesWritten);
-//		Assert.assertEquals("the two customers should have the same properties ", this.customer, readCustomer);
+		GenericDatumReader<Customer> reader = new GenericDatumReader<Customer>();
+		reader.setSchema(s);
+		readCustomer= reader.read(readCustomer,decoder);
+    	Assert.assertEquals("the two customers should have the same properties ", this.customer, readCustomer);
 	}
 
 	@Test
