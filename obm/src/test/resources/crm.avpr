@@ -1,0 +1,29 @@
+{
+    "namespace" : "org.springframework.obm.avro.crm",
+    "saslProtocol" : "Crm",
+    "types" : [
+        {
+            "name" : "Customer", "type": "record",
+            "fields" : [
+                { "name" : "firstName", "type": ["string","null"] },
+                { "name" : "lastName", "type": ["string","null"] },
+                { "name" : "email", "type": ["string","null"] },
+                { "name" : "id", "type": ["int","null"] }
+            ]
+        },
+        {
+            "name" : "User", "type": "record",
+            "fields" : [
+                { "name" : "email", "type": ["string","null"] },
+                { "name" : "password", "type": ["string","null"] }
+            ]
+        }
+
+    ],
+    "messages" : {
+        "createCustomer" : {
+            "request" : [ { "name" : "fn", "type": "string"}, { "name" : "ln", "type": "string"}, { "name" : "email", "type": "string"}  ],
+            "response" :  "Customer"
+        }
+    }
+}
