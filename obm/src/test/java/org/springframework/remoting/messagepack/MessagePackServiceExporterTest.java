@@ -49,8 +49,8 @@ public class MessagePackServiceExporterTest {
 	@Configuration
 	static class MyClientConfiguration {
 		@Bean
-		public MessagePackRpcProxyFactoryBean<ClientService> clientService() {
-			MessagePackRpcProxyFactoryBean<ClientService> svc = new MessagePackRpcProxyFactoryBean<ClientService>();
+		public MessagePackProxyFactoryBean<ClientService> clientService() {
+			MessagePackProxyFactoryBean<ClientService> svc = new MessagePackProxyFactoryBean<ClientService>();
 			svc.setServiceInterface(ClientService.class);
 			svc.setPort(PORT);
 			svc.setHost(HOST);
@@ -73,8 +73,8 @@ public class MessagePackServiceExporterTest {
 		}
 
 		@Bean
-		public MessagePackRpcServiceExporter helloService() throws Exception {
-			MessagePackRpcServiceExporter exporter = new MessagePackRpcServiceExporter();
+		public MessagePackServiceExporter helloService() throws Exception {
+			MessagePackServiceExporter exporter = new MessagePackServiceExporter();
 			exporter.setHost(HOST);
 			exporter.setPort(PORT);
 			exporter.setService(service());

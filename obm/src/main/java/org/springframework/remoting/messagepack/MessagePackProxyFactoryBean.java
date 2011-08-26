@@ -44,7 +44,7 @@ import java.util.Set;
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
  */
-public class MessagePackRpcProxyFactoryBean<T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
+public class MessagePackProxyFactoryBean<T> extends RemoteAccessor implements FactoryBean<T>, BeanClassLoaderAware, InitializingBean {
 
     private Log log = LogFactory.getLog(getClass());
     private boolean remapResults = true;

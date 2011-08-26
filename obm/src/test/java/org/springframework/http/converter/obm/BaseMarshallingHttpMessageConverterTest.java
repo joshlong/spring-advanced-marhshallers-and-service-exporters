@@ -1,6 +1,7 @@
 package org.springframework.http.converter.obm;
 
 import junit.framework.Assert;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -74,6 +75,8 @@ public class BaseMarshallingHttpMessageConverterTest extends BaseMarshallerTest 
         Object result = marshallingHttpMessageConverter.read(clazz, inputMessage);
         Assert.assertNotNull(result);
         Assert.assertEquals("the resulting objects must be .equals()", result, output);
-
     }
+
+    @Test
+    public void doFoo (){ }
 }

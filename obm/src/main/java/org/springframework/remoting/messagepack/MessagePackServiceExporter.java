@@ -42,7 +42,7 @@ import java.util.Set;
  * @see org.springframework.remoting.rmi.RmiServiceExporter
  * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
  */
-public class MessagePackRpcServiceExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
+public class MessagePackServiceExporter extends RemoteInvocationBasedExporter implements InitializingBean, SmartLifecycle {
 
     private volatile boolean running = true;
 
