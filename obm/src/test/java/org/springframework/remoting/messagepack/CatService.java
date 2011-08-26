@@ -16,6 +16,9 @@
 
 package org.springframework.remoting.messagepack;
 
+/**
+ * @author Josh Long
+ */
 public interface CatService {
 	Cat fetch();
 }

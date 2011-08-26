@@ -23,6 +23,9 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * @author Josh Long
+ */
 public class DefaultEchoService implements EchoService, CatService {
 
 	private ExecutorService executor = Executors.newSingleThreadExecutor();

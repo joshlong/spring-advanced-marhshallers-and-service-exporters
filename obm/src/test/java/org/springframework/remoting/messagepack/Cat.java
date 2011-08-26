@@ -23,6 +23,7 @@ import java.util.Set;
 
 /**
  * Dummy entity with state to test RPC withc complex objects
+ * @author Josh Long
  */
 public class Cat {
 

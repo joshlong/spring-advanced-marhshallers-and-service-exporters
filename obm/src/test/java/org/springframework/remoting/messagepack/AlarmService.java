@@ -19,6 +19,8 @@ package org.springframework.remoting.messagepack;
 
 /**
  * interface that requires support for broadcasting (in all-caps, no less!) a given message.
+ *
+ * @author Josh Long
  */
 public interface AlarmService {
 

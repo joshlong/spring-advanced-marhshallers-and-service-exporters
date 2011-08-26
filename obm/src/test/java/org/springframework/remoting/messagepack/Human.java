@@ -17,7 +17,7 @@
 package org.springframework.remoting.messagepack;
 
 /**
- *
+ *    @author Josh Long
  */
 public class Human {
 	private String name;
