@@ -16,19 +16,58 @@
 
 package org.springframework.http.converter.obm;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.mortbay.jetty.Server;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.obm.thrift.ThriftCrmService;
 import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.obm.thrift.crm.Customer;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.DispatcherServletJettyConfigurationCallback;
+import org.springframework.util.EndpointTestUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Josh Long
  */
 public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageConverterTest {
 
+    private Log log = LogFactory.getLog(getClass());
+
     private Customer customer = new Customer("Josh", "Long", "josh@email.com", 242);
-    private MediaType mediaType = new MediaType("application", "x-thrift");
+
+    static final public MediaType MEDIA_TYPE = new MediaType("application", "x-thrift");
 
     @Before
     public void before() throws Throwable {
@@ -39,16 +78,151 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
-        setMediaType(mediaType);
+        setMediaType(MEDIA_TYPE);
 
         MarshallingHttpMessageConverter converter = new MarshallingHttpMessageConverter(marshaller);
+        converter.setSupportedMediaTypes(Arrays.asList(MEDIA_TYPE));
         setHttpMessageConverter(converter);
     }
 
+    // this is more of a mock test
     @Test
     public void testHttpReading() throws Throwable {
         doTestHttpWriting(customer.getClass(), customer);
     }
 
+    @Test
+    public void testIntegrationWithRest() throws Throwable {
+        DispatcherServletJettyConfigurationCallback callback = new DispatcherServletJettyConfigurationCallback(RestConfiguration.class);
+        Server server = EndpointTestUtils.serve(callback);
+        server.start();
+
+
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
+        RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
+
+        String url = buildServiceUrl("ws/customers/{customerId}");
+
+        Map<String, Object> mapOfVars = new HashMap<String, Object>();
+        mapOfVars.put("customerId", 3);
+
+        Customer customer = restTemplate.getForEntity(url, Customer.class, mapOfVars).getBody();
+        log.info("response payload: " + ToStringBuilder.reflectionToString(customer));
+        restTemplate.execute(url, HttpMethod.GET, null, new DebuggingResponseExtractor(), mapOfVars);
+    }
+
+    static class DebuggingResponseExtractor implements ResponseExtractor<Object> {
+
+        @Override
+        public Object extractData(ClientHttpResponse response) throws IOException {
+            debug("Response: ", response.getHeaders());
+            return null;
+        }
+    }
+
+    static void debug(String title, HttpHeaders headers) {
+        System.out.println("============== " + title + " ==============");
+        for (String k : headers.keySet()) {
+            System.out.println(String.format("%s = %s", k, headers.get(k)));
+        }
+    }
+
+
+    private String buildServiceUrl(String prefix) {
+        return "http://localhost:8080/" + (prefix.startsWith("/") ? "" : "/") + prefix;
+    }
+
+    @Configuration
+    public static class CommonConfiguration {
+
+        @Bean
+        public MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter() {
+            MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
+            mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
+            return mappingJacksonHttpMessageConverter;
+        }
+
+        @Bean
+        public ThriftMarshaller thriftMarshaller() {
+            return new ThriftMarshaller();
+        }
+
+        @Bean
+        public MarshallingHttpMessageConverter messagePackHttpMessageConverter() {
+            MarshallingHttpMessageConverter mc = new MarshallingHttpMessageConverter(thriftMarshaller());
+            mc.setSupportedMediaTypes(Arrays.asList(ThriftHttpMessageConverterTest.MEDIA_TYPE));
+            return mc;
+        }
+
+        public List<HttpMessageConverter<?>> messageConverters() {
+            return Arrays.<HttpMessageConverter<?>>asList(mappingJacksonHttpMessageConverter(), messagePackHttpMessageConverter());
+        }
+    }
+
+    @Configuration
+    @Import(CommonConfiguration.class)
+    public static class ClientConfiguration {
+
+        @Inject private CommonConfiguration commonConfiguration;
+
+        private ClientHttpRequestInterceptor clientHttpRequestInterceptor =
+                new ClientHttpRequestInterceptor() {
+                    @Override
+                    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+                        request.getHeaders().setAccept(Arrays.asList(ThriftHttpMessageConverterTest.MEDIA_TYPE));
+                        debug("Request: ", request.getHeaders());
+                        return execution.execute(request, body);
+                    }
+                };
+
+        @Bean
+        @SuppressWarnings("unused")
+        public RestTemplate restTemplate() {
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(commonConfiguration.messagePackHttpMessageConverter()));
+            restTemplate.setInterceptors(new ClientHttpRequestInterceptor[]{this.clientHttpRequestInterceptor});
+            return restTemplate;
+        }
+    }
+
+    @Configuration
+    @Import(CommonConfiguration.class)
+    @EnableWebMvc
+    public static class RestConfiguration extends WebMvcConfigurerAdapter {
+
+        @Inject private CommonConfiguration commonConfiguration;
+
+        @Override
+        public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+            for (HttpMessageConverter<?> mc : commonConfiguration.messageConverters()) {
+                converters.add(mc);
+            }
+        }
+
+        @Bean
+        public ThriftCrmService crmService() {
+            return new ThriftCrmService();
+        }
+
+        @Bean
+        public CrmRestController crmController() {
+            return new CrmRestController();
+        }
+
+    }
+
+    @Controller
+    @RequestMapping(value = "/ws/")
+    public static class CrmRestController {
+
+        @Inject
+        private ThriftCrmService crmService;
+
+        @RequestMapping(value = "/customers/{id}", method = RequestMethod.GET)
+        @ResponseBody
+        public Customer customer(@PathVariable("id") int id) {
+            return crmService.getCustomerById(id);
+        }
+    }
 
 }

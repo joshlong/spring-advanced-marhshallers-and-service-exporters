@@ -3,6 +3,7 @@ package org.springframework.remoting.thrift;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.thrift.TException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +12,9 @@ import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.util.ClassUtils;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +25,6 @@ import java.util.concurrent.Executors;
  * @author Josh Long
  */
 public class TestThriftExporter {
-
 
     private Log log = LogFactory.getLog(getClass());
     private ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -76,6 +79,7 @@ public class TestThriftExporter {
         server = e;
         executor.submit(new ServerRunnable(e));
 
+        // give the server a bit to bind to the socket and so on...
         Thread.sleep(1000 * 1);
 
         // create the client
@@ -98,4 +102,36 @@ public class TestThriftExporter {
             }
         });
     }
+
+    static public class CustomCrmService implements Crm.Iface {
+
+        private List<String> firstNames = Arrays.asList("Josh", "Oliver", "Costin", "Juergen", "Rod", "Mark", "Dave", "Arjen", "Keith", "Adam", "Mike", "Mario");
+        private List<String> lastNames = Arrays.asList("Lee", "Loo", "Wi", "Li", "Humble", "Duong", "Kuo");
+        private final Random lnRandom = new Random();
+        private final Random fnRandom = new Random();
+        private final Random idRandom = new Random();
+
+        private String lastName() {
+            int i = lnRandom.nextInt(lastNames.size());
+            return lastNames.get(i);
+        }
+
+        private String firstName() {
+            int i = fnRandom.nextInt(firstNames.size());
+            return firstNames.get(i);
+        }
+
+        @Override
+        public Customer createCustomer(String fn, String ln, String email) throws TException {
+            return new Customer(fn, ln, email, idRandom.nextInt());
+        }
+
+        @Override
+        public Customer getCustomerById(int customerId) throws TException {
+            String fn = firstName();
+            String ln = lastName();
+            return new Customer(fn, ln, fn + "@email.com", customerId);
+        }
+    }
+
 }

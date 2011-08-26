@@ -32,7 +32,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
- *
  * Implementation of the marshaler and unmarshaller contracts that delegates to MessagePack for serialization
  *
  * @author Josh Long

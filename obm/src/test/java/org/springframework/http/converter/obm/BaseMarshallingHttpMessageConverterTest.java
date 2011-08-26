@@ -58,7 +58,7 @@ public class BaseMarshallingHttpMessageConverterTest extends BaseMarshallerTest 
 
         Assert.assertNotNull("object to output can't be null", output);
 
-        Assert.assertTrue("the marshaller must be able to read this class ",
+        Assert.assertTrue("the thriftMarshaller must be able to read this class ",
                                  marshallingHttpMessageConverter.supports(clazz) &&
                                          this.unmarshaller.supports(clazz));
         HttpHeaders headers = Mockito.mock(HttpHeaders.class);
@@ -78,7 +78,7 @@ public class BaseMarshallingHttpMessageConverterTest extends BaseMarshallerTest 
     private void doTestHttpReading(Class<?> clazz, Object output, InputStream inputStream) throws Throwable {
         setup();
         Assert.assertNotNull("object to output can't be null", output);
-        Assert.assertTrue("the marshaller must be able to read this class ",
+        Assert.assertTrue("the thriftMarshaller must be able to read this class ",
                                  marshallingHttpMessageConverter.supports(clazz) &&
                                          this.unmarshaller.supports(clazz));
         HttpHeaders headers = Mockito.mock(HttpHeaders.class);

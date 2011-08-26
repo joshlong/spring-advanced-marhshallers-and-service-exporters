@@ -45,6 +45,7 @@ public class TestMessagePackServiceExporter {
 
     public static interface ClientService extends EchoService, CatService {
         Future<String> hello(String name);
+
         Future<Cat> fetchCat();
     }
 

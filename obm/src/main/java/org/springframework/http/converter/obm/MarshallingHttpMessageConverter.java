@@ -19,6 +19,7 @@ package org.springframework.http.converter.obm;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -29,6 +30,7 @@ import org.springframework.util.Assert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * The idea is that this class wil do the work that all of other defintions do because, essentially, their only differentiator is that
@@ -37,7 +39,7 @@ import java.io.OutputStream;
  * @author Josh Long
  * @see org.springframework.http.converter.HttpMessageConverter
  */
-public class MarshallingHttpMessageConverter extends AbstractHttpMessageConverter<Object > implements InitializingBean {
+public class MarshallingHttpMessageConverter extends AbstractHttpMessageConverter<Object> implements InitializingBean {
 
     private Marshaller marshaller;
 
@@ -64,12 +66,16 @@ public class MarshallingHttpMessageConverter extends AbstractHttpMessageConverte
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return marshaller.supports(clazz ) && unmarshaller.supports(clazz);
+        return marshaller.supports(clazz) && unmarshaller.supports(clazz);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(this.marshaller, "the 'marshaller' can't be null");
+        List<MediaType> mediaTypes = this.getSupportedMediaTypes();
+        Assert.isTrue(mediaTypes.size() > 0, "the " + getClass().getName() + " has no " +
+                                                     "'supportedMediaTypes.' This is most likely a configuration error" +
+                                                     " and is not likely to work the way you expect it.");
+        Assert.notNull(this.marshaller, "the 'thriftMarshaller' can't be null");
         Assert.notNull(this.unmarshaller, "the 'unmarshaller' can't be null");
     }
 

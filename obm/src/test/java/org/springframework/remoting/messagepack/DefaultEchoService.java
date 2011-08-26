@@ -78,9 +78,10 @@ public class DefaultEchoService implements EchoService, CatService {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(3 * 1000);
+                    long time = 2;
+                    Thread.sleep(time * 1000);
                     if (log.isDebugEnabled()) {
-                        log.debug("sleeping for 10s");
+                        log.debug("sleeping for " + time + "s");
                     }
                     request.sendResult("Hello, " + in);
                 } catch (Throwable thro) {
@@ -106,8 +107,7 @@ public class DefaultEchoService implements EchoService, CatService {
                     }
                 }
             }
-        }
-        );
+        });
     }
 
     @Override

@@ -47,7 +47,7 @@ public class AvroServiceExporter extends AbstractAvroExporter implements HttpReq
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Assert.notNull(this.mediaType, "the 'mediaType' property should not be null");
+        Assert.notNull(this.mediaType, "the 'MEDIA_TYPE' property should not be null");
         ResponderRequestHandlerUtils.handleRequest(this.mediaType, request, response, getResponder());
     }
 }

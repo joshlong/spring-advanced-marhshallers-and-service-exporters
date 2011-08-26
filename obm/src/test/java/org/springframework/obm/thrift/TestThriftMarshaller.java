@@ -28,3 +28,4 @@ public class TestThriftMarshaller extends BaseMarshallerTest<Customer> {
         doTestMarshalling(Customer.class, customer);
     }
 }
+

@@ -19,7 +19,7 @@ import java.io.OutputStream;
  *
  * @author Josh Long
  */
-public class ThriftMarshaller <T extends TBase > extends AbstractMarshaller<T>  implements InitializingBean {
+public class ThriftMarshaller<T extends TBase> extends AbstractMarshaller<T> implements InitializingBean {
 
     private TSerializer serializer;
 
@@ -35,12 +35,12 @@ public class ThriftMarshaller <T extends TBase > extends AbstractMarshaller<T>  
 
     @Override
     public boolean supports(Class clazz) {
-        return true ;
+        return true;
     }
 
     @Override
     public void marshal(T obj, OutputStream os) throws IOException, XmlMappingException {
-         Assert.isInstanceOf(TBase.class, obj);
+        Assert.isInstanceOf(TBase.class, obj);
         try {
             byte[] bytesForObj = this.serializer.serialize(obj);
             FileCopyUtils.copy(bytesForObj, os);
@@ -70,7 +70,6 @@ public class ThriftMarshaller <T extends TBase > extends AbstractMarshaller<T>  
             throw new RuntimeException(e);
         }
     }
-
 
 
     @Override

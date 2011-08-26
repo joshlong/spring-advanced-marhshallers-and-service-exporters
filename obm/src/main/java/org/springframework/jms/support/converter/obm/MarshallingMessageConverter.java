@@ -79,7 +79,7 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.payloadClass, "the payload class can't be null");
-        Assert.notNull(this.marshaller, "Property 'marshaller' is required");
+        Assert.notNull(this.marshaller, "Property 'thriftMarshaller' is required");
         Assert.notNull(this.unmarshaller, "Property 'unmarshaller' is required");
     }
 
