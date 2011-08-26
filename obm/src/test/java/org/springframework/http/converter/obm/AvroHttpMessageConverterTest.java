@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.obm.avro.AvroMarshaller;
 import org.springframework.obm.avro.crm.Customer;
-import org.springframework.obm.messagepack.MessagePackMarshaller;
 
 /**
  * test the {@link org.springframework.http.converter.HttpMessageConverter avro http converter}

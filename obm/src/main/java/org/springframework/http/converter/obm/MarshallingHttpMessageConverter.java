@@ -47,7 +47,7 @@ public class MarshallingHttpMessageConverter extends AbstractHttpMessageConverte
     }
 
     @Override
-    protected boolean supports(Class<?> clazz) {
+    public boolean supports(Class<?> clazz) {
         return marshaller.supports(clazz ) && unmarshaller.supports(clazz);
     }
 

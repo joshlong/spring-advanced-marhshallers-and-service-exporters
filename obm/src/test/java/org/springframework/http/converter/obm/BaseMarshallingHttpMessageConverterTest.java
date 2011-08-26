@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.obm.MarshallingHttpMessageConverter;
 import org.springframework.obm.BaseMarshallerTest;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
- * Tests the {@link MarshallingHttpMessageConverter}
+ * Tests the {@link org.springframework.http.converter.obm.MarshallingHttpMessageConverter}
  *
  * @author Josh Long
  */
@@ -30,7 +31,7 @@ public class BaseMarshallingHttpMessageConverterTest extends BaseMarshallerTest 
         this.marshallingHttpMessageConverter = marshallingHttpMessageConverter;
     }
 
-    protected void setup() {
+    private void setup() {
         Assert.assertNotNull(this.marshallingHttpMessageConverter);
         Assert.assertNotNull(this.marshaller);
         Assert.assertNotNull(this.unmarshaller);

@@ -131,7 +131,6 @@ public class MessagePackServiceExporterTest {
 		}
 	}
 
-	// 661 250 5230
 	@Test
 	public void testFutureWorks() throws Throwable {
 
