@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * <p>Set on the {@link org.springframework.web.client.RestTemplate#setInterceptors(org.springframework.http.client.ClientHttpRequestInterceptor[])}
  * property to set tye {@link MediaType} on the client.</p>
- *
+ * <p/>
  * <p>Additionally, if the {@link org.apache.commons.logging.Log#isDebugEnabled() debug is enable in Apache Comons log}
  * then this method will {@link Log#debug(Object)} the outbound request</p>
  * </p>

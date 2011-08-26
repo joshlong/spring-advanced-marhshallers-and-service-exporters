@@ -84,17 +84,27 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
     }
 
     protected Object unmarshalFromBytesMessage(Class clzz, BytesMessage message, org.springframework.obm.Unmarshaller unmarshaller) throws JMSException, IOException, XmlMappingException {
-        byte[] bytes = new byte[(int) message.getBodyLength()];
-        message.readBytes(bytes);
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        return unmarshaller.unmarshal(clzz, bis);
+        try {
+            byte[] bytes = new byte[(int) message.getBodyLength()];
+            message.readBytes(bytes);
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+
+            return unmarshaller.unmarshal(clzz, bis);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected BytesMessage marshalToBytesMessage(Object object, Session session, org.springframework.obm.Marshaller marshaller) throws JMSException, IOException, XmlMappingException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        marshaller.marshal(object, bos);
-        BytesMessage message = session.createBytesMessage();
-        message.writeBytes(bos.toByteArray());
+        BytesMessage message;
+        try {
+            marshaller.marshal(object, bos);
+            message = session.createBytesMessage();
+            message.writeBytes(bos.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return message;
     }
 

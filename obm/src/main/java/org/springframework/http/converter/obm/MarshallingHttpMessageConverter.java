@@ -82,12 +82,20 @@ public class MarshallingHttpMessageConverter extends AbstractHttpMessageConverte
     @Override
     protected Object readInternal(Class clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
         InputStream in = inputMessage.getBody();
-        return unmarshaller.unmarshal(clazz, in);
+        try {
+            return unmarshaller.unmarshal(clazz, in);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     protected void writeInternal(Object o, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         OutputStream out = outputMessage.getBody();
-        marshaller.marshal(o, out);
+        try {
+            marshaller.marshal(o, out);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

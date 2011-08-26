@@ -21,10 +21,8 @@ import org.msgpack.Template;
 import org.msgpack.template.builder.BeansTemplateBuilder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.obm.support.AbstractMarshaller;
-import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
@@ -59,7 +57,7 @@ public class MessagePackMarshaller<T> extends AbstractMarshaller<T> implements I
     }
 
     @Override
-    public void marshal(T obj, OutputStream os) throws IOException, XmlMappingException {
+    public void marshal(T obj, OutputStream os) throws Exception {
         Assert.isTrue(messagePackSupports(obj.getClass()), "the class must be registered");
         MessagePack.pack(os, obj);
     }
@@ -70,7 +68,7 @@ public class MessagePackMarshaller<T> extends AbstractMarshaller<T> implements I
     }
 
     @Override
-    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
+    public T unmarshal(Class<T> clazz, InputStream source) throws Exception {
         Assert.isTrue(messagePackSupports(clazz), "the class must be registered");
         return MessagePack.unpack(source, clazz);
     }

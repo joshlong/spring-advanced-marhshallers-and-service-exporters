@@ -17,9 +17,6 @@
 package org.springframework.obm;
 
 
-import org.springframework.oxm.XmlMappingException;
-
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -41,6 +38,6 @@ public interface Marshaller<T> {
 
     boolean supports(Class<T> clazz);
 
-    void marshal(T obj, OutputStream os) throws IOException, XmlMappingException;
+    void marshal(T obj, OutputStream os) throws Exception;
 
 }
