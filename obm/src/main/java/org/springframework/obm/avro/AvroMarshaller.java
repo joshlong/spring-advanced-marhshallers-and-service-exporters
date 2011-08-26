@@ -54,7 +54,6 @@ public class AvroMarshaller<T> extends AbstractMarshaller<T> {
         this.validate = validate;
     }
 
-
     @Override
     public boolean supports(Class clazz) {
         try {
@@ -78,15 +77,10 @@ public class AvroMarshaller<T> extends AbstractMarshaller<T> {
     @Override
     public void marshal(Object obj, OutputStream os) throws IOException, XmlMappingException {
         try {
-
             Assert.notNull(obj, "the object to encode must not be null");
-
             Schema schema = new SchemaFactoryBean(obj.getClass()).getObject();
             Assert.notNull(schema, "the schema must not be null");
-
             GenericDatumWriter writer = new GenericDatumWriter(schema);
-
-
             Encoder encoder = new EncoderFactoryBuilder()
                                       .setOutputStream(os)
                                       .setSchema(schema)
@@ -105,28 +99,19 @@ public class AvroMarshaller<T> extends AbstractMarshaller<T> {
 
     @Override
     public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
-
         try {
-
             Assert.notNull(clazz, "the class must not be null");
-
             Schema schema = new SchemaFactoryBean(clazz).getObject();
             Assert.notNull(schema, "the schema must not be null");
-
             GenericDatumReader reader = new GenericDatumReader(schema);
-
             Object old = clazz.newInstance();
-
             Decoder decoder = new DecoderFactoryBuilder()
                                       .setInputStream(source)
                                       .setUseBinary(true)
                                       .setSchema(schema)
                                       .setValidate(this.validate)
                                       .build();
-
             return (T) reader.read(old, decoder);
-
-
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
