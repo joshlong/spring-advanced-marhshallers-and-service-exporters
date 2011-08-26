@@ -79,7 +79,7 @@ public class TestThriftExporter {
         server = e;
         executor.submit(new ServerRunnable(e));
 
-        Thread.sleep(1000 * 3);
+        Thread.sleep(1000 * 1);
 
         // create the client
         ThriftProxyFactoryBean<Crm.Iface> client = new ThriftProxyFactoryBean<Crm.Iface>();
