@@ -15,13 +15,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ *
+ * a strange, but working, test case that launches the thrift service in a background thread and then shuts it down afterwards which lets us
+ * verify that we can talk to the exporter service with no problems.
+ *
  * @author Josh Long
  */
 public class TestThriftServiceExporter {
 
-    /**
-     * launch the server in a separate thread so that we can then create the client
-     */
+
     private Log log = LogFactory.getLog(getClass());
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private ThriftExporter server = new ThriftExporter();
