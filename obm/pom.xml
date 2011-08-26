@@ -244,12 +244,13 @@
                 <groupId>com.google.protobuf.tools</groupId>
                 <artifactId>maven-protoc-plugin</artifactId>
                 <configuration>
+                    <protoSourceRoot>${basedir}/src/main/resources</protoSourceRoot>
                     <protoTestSourceRoot>${basedir}/src/test/resources</protoTestSourceRoot>
                 </configuration>
                 <!--<configuration>
                     <protocExecutable>/usr/local/bin/protoc</protocExecutable>
                 </configuration>-->
-                <executions>
+                <!--<executions>
                     <execution>
 
                         <goals>
@@ -257,7 +258,7 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.avro</groupId>

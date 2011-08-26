@@ -1,0 +1,12 @@
+package crm;
+
+option java_package = "org.springframework.obm.protocolbuffers.crm";
+option java_outer_classname= "Crm";
+option optimize_for = SPEED;
+
+message Customer {
+ optional int64 id =1;
+ required string firstName = 2;
+ required string lastName = 3;
+ required string email= 4;
+}

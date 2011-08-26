@@ -35,33 +35,33 @@ public final class Crm {
       return org.springframework.obm.protocolbuffers.crm.Crm.internal_static_crm_Customer_fieldAccessorTable;
     }
     
-    // required string firstName = 1;
-    public static final int FIRSTNAME_FIELD_NUMBER = 1;
+    // optional int64 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+    private boolean hasId;
+    private long id_ = 0L;
+    public boolean hasId() { return hasId; }
+    public long getId() { return id_; }
+    
+    // required string firstName = 2;
+    public static final int FIRSTNAME_FIELD_NUMBER = 2;
     private boolean hasFirstName;
     private java.lang.String firstName_ = "";
     public boolean hasFirstName() { return hasFirstName; }
     public java.lang.String getFirstName() { return firstName_; }
     
-    // required string lastName = 2;
-    public static final int LASTNAME_FIELD_NUMBER = 2;
+    // required string lastName = 3;
+    public static final int LASTNAME_FIELD_NUMBER = 3;
     private boolean hasLastName;
     private java.lang.String lastName_ = "";
     public boolean hasLastName() { return hasLastName; }
     public java.lang.String getLastName() { return lastName_; }
     
-    // required string email = 3;
-    public static final int EMAIL_FIELD_NUMBER = 3;
+    // required string email = 4;
+    public static final int EMAIL_FIELD_NUMBER = 4;
     private boolean hasEmail;
     private java.lang.String email_ = "";
     public boolean hasEmail() { return hasEmail; }
     public java.lang.String getEmail() { return email_; }
-    
-    // optional int64 id = 4;
-    public static final int ID_FIELD_NUMBER = 4;
-    private boolean hasId;
-    private long id_ = 0L;
-    public boolean hasId() { return hasId; }
-    public long getId() { return id_; }
     
     private void initFields() {
     }
@@ -75,17 +75,17 @@ public final class Crm {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      if (hasId()) {
+        output.writeInt64(1, getId());
+      }
       if (hasFirstName()) {
-        output.writeString(1, getFirstName());
+        output.writeString(2, getFirstName());
       }
       if (hasLastName()) {
-        output.writeString(2, getLastName());
+        output.writeString(3, getLastName());
       }
       if (hasEmail()) {
-        output.writeString(3, getEmail());
-      }
-      if (hasId()) {
-        output.writeInt64(4, getId());
+        output.writeString(4, getEmail());
       }
       getUnknownFields().writeTo(output);
     }
@@ -96,21 +96,21 @@ public final class Crm {
       if (size != -1) return size;
     
       size = 0;
+      if (hasId()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, getId());
+      }
       if (hasFirstName()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(1, getFirstName());
+          .computeStringSize(2, getFirstName());
       }
       if (hasLastName()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getLastName());
+          .computeStringSize(3, getLastName());
       }
       if (hasEmail()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(3, getEmail());
-      }
-      if (hasId()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(4, getId());
+          .computeStringSize(4, getEmail());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -270,6 +270,9 @@ public final class Crm {
       
       public Builder mergeFrom(org.springframework.obm.protocolbuffers.crm.Crm.Customer other) {
         if (other == org.springframework.obm.protocolbuffers.crm.Crm.Customer.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          setId(other.getId());
+        }
         if (other.hasFirstName()) {
           setFirstName(other.getFirstName());
         }
@@ -278,9 +281,6 @@ public final class Crm {
         }
         if (other.hasEmail()) {
           setEmail(other.getEmail());
-        }
-        if (other.hasId()) {
-          setId(other.getId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -307,20 +307,20 @@ public final class Crm {
               }
               break;
             }
-            case 10: {
-              setFirstName(input.readString());
+            case 8: {
+              setId(input.readInt64());
               break;
             }
             case 18: {
-              setLastName(input.readString());
+              setFirstName(input.readString());
               break;
             }
             case 26: {
-              setEmail(input.readString());
+              setLastName(input.readString());
               break;
             }
-            case 32: {
-              setId(input.readInt64());
+            case 34: {
+              setEmail(input.readString());
               break;
             }
           }
@@ -328,7 +328,25 @@ public final class Crm {
       }
       
       
-      // required string firstName = 1;
+      // optional int64 id = 1;
+      public boolean hasId() {
+        return result.hasId();
+      }
+      public long getId() {
+        return result.getId();
+      }
+      public Builder setId(long value) {
+        result.hasId = true;
+        result.id_ = value;
+        return this;
+      }
+      public Builder clearId() {
+        result.hasId = false;
+        result.id_ = 0L;
+        return this;
+      }
+      
+      // required string firstName = 2;
       public boolean hasFirstName() {
         return result.hasFirstName();
       }
@@ -349,7 +367,7 @@ public final class Crm {
         return this;
       }
       
-      // required string lastName = 2;
+      // required string lastName = 3;
       public boolean hasLastName() {
         return result.hasLastName();
       }
@@ -370,7 +388,7 @@ public final class Crm {
         return this;
       }
       
-      // required string email = 3;
+      // required string email = 4;
       public boolean hasEmail() {
         return result.hasEmail();
       }
@@ -388,24 +406,6 @@ public final class Crm {
       public Builder clearEmail() {
         result.hasEmail = false;
         result.email_ = getDefaultInstance().getEmail();
-        return this;
-      }
-      
-      // optional int64 id = 4;
-      public boolean hasId() {
-        return result.hasId();
-      }
-      public long getId() {
-        return result.getId();
-      }
-      public Builder setId(long value) {
-        result.hasId = true;
-        result.id_ = value;
-        return this;
-      }
-      public Builder clearId() {
-        result.hasId = false;
-        result.id_ = 0L;
         return this;
       }
       
@@ -435,9 +435,9 @@ public final class Crm {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tcrm.proto\022\003crm\"J\n\010Customer\022\021\n\tfirstNam" +
-      "e\030\001 \002(\t\022\020\n\010lastName\030\002 \002(\t\022\r\n\005email\030\003 \002(\t" +
-      "\022\n\n\002id\030\004 \001(\003B4\n+org.springframework.obm." +
+      "\n\tcrm.proto\022\003crm\"J\n\010Customer\022\n\n\002id\030\001 \001(\003" +
+      "\022\021\n\tfirstName\030\002 \002(\t\022\020\n\010lastName\030\003 \002(\t\022\r\n" +
+      "\005email\030\004 \002(\tB4\n+org.springframework.obm." +
       "protocolbuffers.crmB\003CrmH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
@@ -450,7 +450,7 @@ public final class Crm {
           internal_static_crm_Customer_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_crm_Customer_descriptor,
-              new java.lang.String[] { "FirstName", "LastName", "Email", "Id", },
+              new java.lang.String[] { "Id", "FirstName", "LastName", "Email", },
               org.springframework.obm.protocolbuffers.crm.Crm.Customer.class,
               org.springframework.obm.protocolbuffers.crm.Crm.Customer.Builder.class);
           return null;
