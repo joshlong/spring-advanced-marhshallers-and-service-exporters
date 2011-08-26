@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.obm.thrift.rpc;
+package org.springframework.remoting.thrift;
 
 import org.apache.thrift.TException;
 import org.springframework.obm.thrift.crm.Crm;

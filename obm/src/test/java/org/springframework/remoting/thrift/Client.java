@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.obm.thrift.rpc;
+package org.springframework.remoting.thrift;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.remoting.thrift.ThriftProxyFactoryBean;

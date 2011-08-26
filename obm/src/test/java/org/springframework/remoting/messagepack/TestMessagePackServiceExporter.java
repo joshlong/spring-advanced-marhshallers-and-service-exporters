@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 /**
  * @author Josh Long
  */
-public class MessagePackServiceExporterTest {
+public class TestMessagePackServiceExporter {
 
 
 	private AnnotationConfigApplicationContext serverContext, clientContext;
