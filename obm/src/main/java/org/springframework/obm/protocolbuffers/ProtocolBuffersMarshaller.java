@@ -14,6 +14,7 @@ import java.io.OutputStream;
  * @author Josh Long
  */
 public class ProtocolBuffersMarshaller <T>  extends AbstractMarshaller<T> implements InitializingBean {
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
