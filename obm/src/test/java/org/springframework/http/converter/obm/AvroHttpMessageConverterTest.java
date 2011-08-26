@@ -37,7 +37,7 @@ public class AvroHttpMessageConverterTest extends BaseMarshallingHttpMessageConv
         customer.lastName = "Long";
         customer.email = "josh@emai.com";
 
-         AvroMarshaller marshaller = new AvroMarshaller();
+        AvroMarshaller marshaller = new AvroMarshaller();
 
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);

@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- *
  * a strange, but working, test case that launches the thrift service in a background thread and then shuts it down afterwards which lets us
  * verify that we can talk to the exporter service with no problems.
  *
@@ -47,8 +46,6 @@ public class TestThriftExporter {
             }
         }
     }
-
-
 
     @Test
     public void testConsumingFromTheService() throws Throwable {

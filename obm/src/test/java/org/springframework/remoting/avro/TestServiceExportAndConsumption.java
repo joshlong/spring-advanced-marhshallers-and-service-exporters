@@ -20,57 +20,56 @@ import java.util.Random;
  */
 public class TestServiceExportAndConsumption {
 
-	Log log = LogFactory.getLog(getClass()) ;
-	SaslTransceiverCreationCallback transceiverCreationCallback = new SaslTransceiverCreationCallback();
-	SaslServerCreationCallback serverCreationCallback = new SaslServerCreationCallback();
-	AvroExporter avroExporter ;
+    Log log = LogFactory.getLog(getClass());
+    SaslTransceiverCreationCallback transceiverCreationCallback = new SaslTransceiverCreationCallback();
+    SaslServerCreationCallback serverCreationCallback = new SaslServerCreationCallback();
+    AvroExporter avroExporter;
 
-	static class MyCrm implements Crm {
+    static class MyCrm implements Crm {
 
-		static private Random randomIdGenerator = new Random();
+        static private Random randomIdGenerator = new Random();
 
-		@Override
-		public Customer createCustomer(CharSequence fn, CharSequence ln, CharSequence email) throws AvroRemoteException {
-			Customer c = new Customer();
-			c.email = email;
-			c.lastName = ln;
-			c.firstName = fn;
-			c.id = randomIdGenerator.nextInt();
-			return c;
-		}
-	}
+        @Override
+        public Customer createCustomer(CharSequence fn, CharSequence ln, CharSequence email) throws AvroRemoteException {
+            Customer c = new Customer();
+            c.email = email;
+            c.lastName = ln;
+            c.firstName = fn;
+            c.id = randomIdGenerator.nextInt();
+            return c;
+        }
+    }
 
-	@Test
-	public void testCreatingAServer() throws Throwable {
+    @Test
+    public void testCreatingAServer() throws Throwable {
 
-		MyCrm crmImpl = new MyCrm() ;
+        MyCrm crmImpl = new MyCrm();
 
-		avroExporter = new AvroExporter();
-		avroExporter.setService(crmImpl);
-		avroExporter.setServiceInterface(Crm.class);
-		avroExporter.setServerCreationCallback(serverCreationCallback);
-		avroExporter.setBeanClassLoader(ClassUtils.getDefaultClassLoader());
-		avroExporter.afterPropertiesSet();
-		avroExporter.start();
+        avroExporter = new AvroExporter();
+        avroExporter.setService(crmImpl);
+        avroExporter.setServiceInterface(Crm.class);
+        avroExporter.setServerCreationCallback(serverCreationCallback);
+        avroExporter.setBeanClassLoader(ClassUtils.getDefaultClassLoader());
+        avroExporter.afterPropertiesSet();
+        avroExporter.start();
 
-		AvroProxyFactoryBean<Crm> proxyFactoryBean = new AvroProxyFactoryBean<Crm>();
-		proxyFactoryBean.setServiceInterface(Crm.class);
-		proxyFactoryBean.setTransceiverCreationCallback(transceiverCreationCallback);
-		proxyFactoryBean.afterPropertiesSet();
-		Crm crmClient = proxyFactoryBean.getObject() ;
-		Customer customer = crmClient.createCustomer("Josh", "Long", "email@email.com");
-		if( log.isDebugEnabled()) {
-			log.debug( "received result " + ToStringBuilder.reflectionToString(customer));
-		}
-		Assert.assertNotNull(customer);
-	}
+        AvroProxyFactoryBean<Crm> proxyFactoryBean = new AvroProxyFactoryBean<Crm>();
+        proxyFactoryBean.setServiceInterface(Crm.class);
+        proxyFactoryBean.setTransceiverCreationCallback(transceiverCreationCallback);
+        proxyFactoryBean.afterPropertiesSet();
+        Crm crmClient = proxyFactoryBean.getObject();
+        Customer customer = crmClient.createCustomer("Josh", "Long", "email@email.com");
+        if (log.isDebugEnabled()) {
+            log.debug("received result " + ToStringBuilder.reflectionToString(customer));
+        }
+        Assert.assertNotNull(customer);
+    }
 
-	@After
-	public void stop () throws Throwable {
-		Assert.assertTrue(avroExporter != null );
-		avroExporter.stop();
-	}
-
+    @After
+    public void stop() throws Throwable {
+        Assert.assertTrue(avroExporter != null);
+        avroExporter.stop();
+    }
 
 
 }

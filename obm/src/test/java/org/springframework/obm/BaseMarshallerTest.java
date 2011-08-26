@@ -23,7 +23,7 @@ abstract public class BaseMarshallerTest<T> {
     }
 
 
-    protected  void doTestMarshalling(Class<T> cl, T input) throws Exception {
+    protected void doTestMarshalling(Class<T> cl, T input) throws Exception {
         boolean canItWriteACustomer = marshaller.supports(cl);
         Assert.assertTrue(canItWriteACustomer);
 

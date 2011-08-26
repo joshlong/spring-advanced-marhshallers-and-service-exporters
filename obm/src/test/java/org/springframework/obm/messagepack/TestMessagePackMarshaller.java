@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.springframework.obm.BaseMarshallerTest;
 
 /**
- *
  * Test of the {@link MessagePackMarshaller}
  *
  * @author Josh Long

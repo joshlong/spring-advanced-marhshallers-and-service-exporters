@@ -11,5 +11,5 @@ import org.mortbay.jetty.servlet.Context;
  * @author Josh Long
  */
 public interface JettyContextConfigurationCallback {
-    void configure(Context c) throws Exception ;
+    void configure(Context c) throws Exception;
 }

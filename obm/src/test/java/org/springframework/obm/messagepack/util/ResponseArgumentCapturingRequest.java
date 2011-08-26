@@ -25,23 +25,23 @@ import org.msgpack.rpc.transport.MessageSendable;
  * Shim to get in and see and expose the results of a call that uses a {@link java.util.concurrent.Future} in MessagePack
  */
 public class ResponseArgumentCapturingRequest extends Request {
-	public ResponseArgumentCapturingRequest(MessageSendable channel, int msgid, String method, MessagePackObject args) {
-		super(channel, msgid, method, args);
-	}
+    public ResponseArgumentCapturingRequest(MessageSendable channel, int msgid, String method, MessagePackObject args) {
+        super(channel, msgid, method, args);
+    }
 
-	public ResponseArgumentCapturingRequest(String method, MessagePackObject args) {
-		super(method, args);
-	}
+    public ResponseArgumentCapturingRequest(String method, MessagePackObject args) {
+        super(method, args);
+    }
 
-	private Object result;
+    private Object result;
 
-	@Override
-	public void sendResult(Object result) {
-		this.result = result;
-		super.sendResult(result);
-	}
+    @Override
+    public void sendResult(Object result) {
+        this.result = result;
+        super.sendResult(result);
+    }
 
-	public Object getResult() {
-		return result;
-	}
+    public Object getResult() {
+        return result;
+    }
 }

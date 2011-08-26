@@ -22,7 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.obm.MarshallingHttpMessageConverter;
 import org.springframework.obm.BaseMarshallerTest;
 
 import java.io.ByteArrayInputStream;
@@ -93,5 +92,6 @@ public class BaseMarshallingHttpMessageConverterTest extends BaseMarshallerTest 
     }
 
     @Test
-    public void doFoo (){ }
+    public void doFoo() {
+    }
 }

@@ -14,26 +14,27 @@ import org.springframework.web.servlet.DispatcherServlet;
  */
 public class DispatcherServletJettyConfigurationCallback implements EndpointTestUtils.JettyContextConfigurationCallback {
 
-        private Class<?> configurationClass;
+    private Class<?> configurationClass;
 
-        private String servletPrefix;
+    private String servletPrefix;
 
-        public DispatcherServletJettyConfigurationCallback (Class<?> configurationClass){
-           this(configurationClass, null ) ;
-        }
-        public DispatcherServletJettyConfigurationCallback(Class<?> configurationClass, String servletPrefix) {
-            Assert.notNull(configurationClass, "the configuration class can't be null!");
-            this.configurationClass = configurationClass;
-            this.servletPrefix = StringUtils.hasText(servletPrefix) ? servletPrefix : "/*";
-            Assert.isTrue(this.configurationClass.getAnnotation(Configuration.class) != null,
-                                 "the configuration class must have the " + Configuration.class.getName() + " annotation on it");
-        }
-
-        @Override
-        public void configure(Context context) throws Exception {
-            ServletHolder holder = new ServletHolder(DispatcherServlet.class);
-            holder.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
-            holder.setInitParameter("contextConfigLocation", configurationClass.getName());
-            context.addServlet(holder, this.servletPrefix);
-        }
+    public DispatcherServletJettyConfigurationCallback(Class<?> configurationClass) {
+        this(configurationClass, null);
     }
+
+    public DispatcherServletJettyConfigurationCallback(Class<?> configurationClass, String servletPrefix) {
+        Assert.notNull(configurationClass, "the configuration class can't be null!");
+        this.configurationClass = configurationClass;
+        this.servletPrefix = StringUtils.hasText(servletPrefix) ? servletPrefix : "/*";
+        Assert.isTrue(this.configurationClass.getAnnotation(Configuration.class) != null,
+                             "the configuration class must have the " + Configuration.class.getName() + " annotation on it");
+    }
+
+    @Override
+    public void configure(Context context) throws Exception {
+        ServletHolder holder = new ServletHolder(DispatcherServlet.class);
+        holder.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
+        holder.setInitParameter("contextConfigLocation", configurationClass.getName());
+        context.addServlet(holder, this.servletPrefix);
+    }
+}

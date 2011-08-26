@@ -24,5 +24,5 @@ package org.springframework.remoting.messagepack;
  */
 public interface AlarmService {
 
-	String alarm(String msg);
+    String alarm(String msg);
 }

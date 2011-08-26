@@ -1,7 +1,6 @@
 package org.springframework.obm.messagepack;
 
 /**
- *
  * dummy entity to test
  *
  * @author Josh Long

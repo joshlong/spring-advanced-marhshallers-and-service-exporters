@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
-import org.springframework.stereotype.Service;
 import org.springframework.util.DispatcherServletJettyConfigurationCallback;
 import org.springframework.util.EndpointTestUtils;
 import org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping;
@@ -26,6 +25,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Tests the {@link ThriftServiceExporter} which is a Spring Web {@link org.springframework.web.HttpRequestHandler}
+ * that can satisfy requests over HTTP in the native Thrift RPC format.
+ * <p/>
+ * This is <EM>not</EM> a REST service, however. It just uses HTTP as a transport.
+ *
+ * @author Josh Long
+ */
 public class TestThriftServiceExporter {
 
     private Log log = LogFactory.getLog(getClass());
@@ -72,8 +79,14 @@ public class TestThriftServiceExporter {
     }
 }
 
+/**
+ * The server
+ */
 @Configuration
 class ExporterConfiguration {
+
+    static public final String SERVLET = "/crm";
+
     @Bean
     public Crm.Iface crmServiceImpl() {
         return new CrmService();
@@ -84,7 +97,7 @@ class ExporterConfiguration {
         return new BeanNameUrlHandlerMapping();
     }
 
-    @Bean(name = "/crm")
+    @Bean(name = SERVLET)
     public ThriftServiceExporter crm() {
         ThriftServiceExporter exporter = new ThriftServiceExporter();
         exporter.setService(crmServiceImpl());
@@ -93,12 +106,15 @@ class ExporterConfiguration {
     }
 }
 
+/**
+ * the client
+ */
 @Configuration
 class ThriftProxyClientConfiguration {
     @Bean
     public ThriftProxyFactoryBean client() {
         // demonstrates how to use the protocol over HTTP
-        THttpClient.Factory httpClientFactory = new THttpClient.Factory("http://localhost:8080/crm");
+        THttpClient.Factory httpClientFactory = new THttpClient.Factory("http://localhost:8080" + ExporterConfiguration.SERVLET);
         TTransport tTransport = httpClientFactory.getTransport(null);
 
         ThriftProxyFactoryBean proxy = new ThriftProxyFactoryBean();
@@ -108,7 +124,6 @@ class ThriftProxyClientConfiguration {
     }
 }
 
-@Service("crm")
 class CrmService implements Crm.Iface {
 
     private List<String> firstNames = Arrays.asList("Josh", "Oliver", "Costin", "Juergen", "Rod", "Mark", "Dave", "Arjen", "Keith", "Adam", "Mike", "Mario");
