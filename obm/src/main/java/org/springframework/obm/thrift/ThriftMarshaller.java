@@ -19,8 +19,11 @@ import java.io.OutputStream;
  *
  * @author Josh Long
  */
-public class ThriftMarshaller extends AbstractMarshaller implements InitializingBean {
+public class ThriftMarshaller <T extends TBase > extends AbstractMarshaller<T>  implements InitializingBean {
+
     private TSerializer serializer;
+
+    private TDeserializer deserializer;
 
     public void setDeserializer(TDeserializer deserializer) {
         this.deserializer = deserializer;
@@ -35,14 +38,25 @@ public class ThriftMarshaller extends AbstractMarshaller implements Initializing
         return true ;
     }
 
-    private TDeserializer deserializer;
+    @Override
+    public void marshal(T obj, OutputStream os) throws IOException, XmlMappingException {
+         Assert.isInstanceOf(TBase.class, obj);
+        try {
+            byte[] bytesForObj = this.serializer.serialize(obj);
+            FileCopyUtils.copy(bytesForObj, os);
+        } catch (Throwable e) {
+            if (log.isErrorEnabled()) {
+                log.error("something occurred when trying to TSerializer#serialize() the response", e);
+            }
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
-    public Object unmarshal(Class clazz, InputStream source) throws IOException, XmlMappingException {
+    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
         Assert.isTrue(TBase.class.isAssignableFrom(clazz), "the request payload must be a subclas of TBase");
-        Class<? extends TBase> tBaseClass = (Class<? extends TBase>) clazz;
         try {
-            TBase obj = tBaseClass.newInstance();
+            T obj = clazz.newInstance();
 
             byte[] bytes = FileCopyUtils.copyToByteArray(source);
 
@@ -58,21 +72,6 @@ public class ThriftMarshaller extends AbstractMarshaller implements Initializing
     }
 
 
-
-    @Override
-    public void marshal(Object o, OutputStream result) throws IOException, XmlMappingException {
-        Assert.isInstanceOf(TBase.class, o);
-        try {
-            TBase tBaseOut = (TBase) o;
-            byte[] bytesForObj = this.serializer.serialize(tBaseOut);
-            FileCopyUtils.copy(bytesForObj, result);
-        } catch (Throwable e) {
-            if (log.isErrorEnabled()) {
-                log.error("something occurred when trying to TSerializer#serialize() the response", e);
-            }
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

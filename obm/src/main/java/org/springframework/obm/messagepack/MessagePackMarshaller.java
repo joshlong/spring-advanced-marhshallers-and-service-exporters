@@ -16,9 +16,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
+ *
+ * Implementation of the marshaler and unmarshaller contracts that delegates to MessagePack for serialization
+ *
  * @author Josh Long
  */
-public class MessagePackMarshaller extends AbstractMarshaller  implements InitializingBean{
+public class MessagePackMarshaller<T> extends AbstractMarshaller<T> implements InitializingBean {
+
     private BeansTemplateBuilder beansTemplateBuilder = new BeansTemplateBuilder();
 
     private boolean serializeJavaBeanProperties = true;
@@ -30,20 +34,30 @@ public class MessagePackMarshaller extends AbstractMarshaller  implements Initia
     }
 
     @Override
-    public void marshal(Object graph, OutputStream result) throws IOException, XmlMappingException {
-        Assert.isTrue(messagePackSupports(graph.getClass()), "the class must be registered");
-        MessagePack.pack( result, graph);
+    public void afterPropertiesSet() throws Exception {
+        if (!serializeJavaBeanProperties) {
+            if (log.isDebugEnabled()) {
+                log.debug("the 'serializeJavaBeanProperties' property has been set to false, " +
+                                  "which means that all POJOs must expose public variables to properly be serialized.");
+            }
+        }
     }
 
     @Override
-    public boolean supports(Class clazz) {
+    public void marshal(T obj, OutputStream os) throws IOException, XmlMappingException {
+        Assert.isTrue(messagePackSupports(obj.getClass()), "the class must be registered");
+        MessagePack.pack(os, obj);
+    }
+
+    @Override
+    public boolean supports(Class<T> clazz) {
         return messagePackSupports(clazz);
     }
 
     @Override
-    public Object unmarshal(Class  clazz, InputStream in ) throws IOException, XmlMappingException {
+    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
         Assert.isTrue(messagePackSupports(clazz), "the class must be registered");
-        return MessagePack.unpack(in, clazz);
+        return MessagePack.unpack(source, clazz);
     }
 
     protected boolean messagePackSupports(Class<?> clazz) {
@@ -63,15 +77,5 @@ public class MessagePackMarshaller extends AbstractMarshaller  implements Initia
         }
 
         return true;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-      if (!serializeJavaBeanProperties) {
-            if (log.isDebugEnabled()) {
-                log.debug("the 'serializeJavaBeanProperties' property has been set to false, " +
-                                  "which means that all POJOs must expose public variables to properly be serialized.");
-            }
-        }
     }
 }

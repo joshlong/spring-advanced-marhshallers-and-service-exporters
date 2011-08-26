@@ -3,9 +3,11 @@ package org.springframework.obm.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.io.Decoder;
-import org.springframework.beans.factory.InitializingBean;
+import org.apache.avro.io.Encoder;
 import org.springframework.obm.avro.support.DecoderFactoryBuilder;
+import org.springframework.obm.avro.support.EncoderFactoryBuilder;
 import org.springframework.obm.avro.support.SchemaFactoryBean;
 import org.springframework.obm.support.AbstractMarshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -16,26 +18,35 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author Josh Long
+ * Implementation of the {@link org.springframework.obm.Marshaller} and
+ * {@link org.springframework.obm.Unmarshaller} interfaces for Avro
+ *
  * @param <T>
+ * @author Josh Long
  */
-public class AvroMarshaller <T> extends AbstractMarshaller<T> implements InitializingBean {
+public class AvroMarshaller<T> extends AbstractMarshaller<T> {
 
     private boolean validate = false;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
+    /**
+     * dictates whether the {@link org.apache.avro.io.Encoder encoders} and {@link org.apache.avro.io.Decoder decoders} will
+     * be wrapped in a {@link org.apache.avro.io.ValidatingDecoder} or {@link org.apache.avro.io.ValidatingEncoder}
+     *
+     * @param validate whether or not to validate
+     */
+    public void setValidate(boolean validate) {
+        this.validate = validate;
     }
+
 
     @Override
     public boolean supports(Class clazz) {
-          try {
+        try {
             Assert.notNull(clazz, "the class must not be null");
             Schema s = new SchemaFactoryBean(clazz).getObject();
             boolean supports = s != null;
 
-            if ( log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("returning " + supports + " for class " + clazz.getName());
             }
 
@@ -48,14 +59,37 @@ public class AvroMarshaller <T> extends AbstractMarshaller<T> implements Initial
         }
     }
 
+    @Override
+    public void marshal(Object obj, OutputStream os) throws IOException, XmlMappingException {
+        try {
+
+            Assert.notNull(obj, "the object to encode must not be null");
+
+            Schema schema = new SchemaFactoryBean(obj.getClass()).getObject();
+            Assert.notNull(schema, "the schema must not be null");
+
+            GenericDatumWriter writer = new GenericDatumWriter(schema);
+
+
+            Encoder encoder = new EncoderFactoryBuilder()
+                                      .setOutputStream(os)
+                                      .setSchema(schema)
+                                      .setUseBinary(true)
+                                      .setValidate(this.validate)
+                                      .build();
+            writer.write(obj, encoder);
+            encoder.flush();
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("exception when trying to test whether the class " + obj.getClass().getName() + " has an Avro schema");
+            }
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
-    public void marshal(Object graph, OutputStream result) throws IOException, XmlMappingException {
+    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
 
-    }/*
-
-    @Override
-    public T unmarshal(Class clazz, InputStream source) throws IOException, XmlMappingException {
         try {
 
             Assert.notNull(clazz, "the class must not be null");
@@ -68,39 +102,7 @@ public class AvroMarshaller <T> extends AbstractMarshaller<T> implements Initial
             Object old = clazz.newInstance();
 
             Decoder decoder = new DecoderFactoryBuilder()
-                                      .setInputStream( source)
-                                      .setUseBinary(true)
-                                      .setSchema(schema)
-                                      .setValidate(this.validate)
-                                      .build();
-
-            return reader.read(old, decoder);
-
-
-        } catch (Exception e) {
-            if (log .isDebugEnabled()) {
-                log .debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
-            }
-            throw new RuntimeException(e);
-        }
-    }*/
-
-    @Override
-    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
-
-         try {
-
-            Assert.notNull(clazz, "the class must not be null");
-
-            Schema schema = new SchemaFactoryBean(clazz).getObject();
-            Assert.notNull(schema, "the schema must not be null");
-
-            GenericDatumReader reader = new GenericDatumReader(schema);
-
-            Object old = clazz.newInstance();
-
-            Decoder decoder = new DecoderFactoryBuilder()
-                                      .setInputStream( source)
+                                      .setInputStream(source)
                                       .setUseBinary(true)
                                       .setSchema(schema)
                                       .setValidate(this.validate)
@@ -110,78 +112,10 @@ public class AvroMarshaller <T> extends AbstractMarshaller<T> implements Initial
 
 
         } catch (Exception e) {
-            if (log .isDebugEnabled()) {
-                log .debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
-            }
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
-    /**
-     * dictates whether the {@link org.apache.avro.io.Encoder encoders} and {@link org.apache.avro.io.Decoder decoders} will
-     * be wrapped in a {@link org.apache.avro.io.ValidatingDecoder} or {@link org.apache.avro.io.ValidatingEncoder}
-     *
-     * @param validate whether or not to validate
-     */
-    public void setValidate(boolean validate) {
-        this.validate = validate;
-    }
-
-   /* @Override
-    public boolean supports(Class<?> clazz) {
-      try {
-            Assert.notNull(clazz, "the class must not be null");
-            Schema s = new SchemaFactoryBean(clazz).getObject();
-            boolean supports = s != null;
-
-            if ( log.isDebugEnabled()) {
-                log.debug("returning " + supports + " for class " + clazz.getName());
-            }
-
-            return supports;
-        } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
             }
-            return false;
-        }
-    }
-
-    @Override
-    public T unmarshal(Class<T> clazz, InputStream source) throws IOException, XmlMappingException {
-         try {
-
-            Assert.notNull(clazz, "the class must not be null");
-
-            Schema schema = new SchemaFactoryBean(clazz).getObject();
-            Assert.notNull(schema, "the schema must not be null");
-
-            GenericDatumReader reader = new GenericDatumReader(schema);
-
-            Object old = clazz.newInstance();
-
-            Decoder decoder = new DecoderFactoryBuilder()
-                                      .setInputStream(inputMessage.getBody())
-                                      .setUseBinary(true)
-                                      .setSchema(schema)
-                                      .setValidate(this.validate)
-                                      .build();
-
-            return reader.read(old, decoder);
-
-
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("exception when trying to test whether the class " + clazz.getName() + " has an Avro schema");
-            }
             throw new RuntimeException(e);
         }
-        return null;
     }
-
-    @Override
-    public void marshal(Object graph, OutputStream result) throws IOException, XmlMappingException {
-    }*/
 }
