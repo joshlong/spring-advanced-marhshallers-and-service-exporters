@@ -37,9 +37,10 @@ import java.util.concurrent.Future;
  */
 public class TestMessagePackServiceExporter {
 
-
 	private AnnotationConfigApplicationContext serverContext, clientContext;
+
 	public static String HOST = "127.0.0.1";
+
 	public static int PORT = 1995;
 
 	public static interface ClientService extends EchoService, CatService {
@@ -63,12 +64,10 @@ public class TestMessagePackServiceExporter {
 
 	@Configuration
 	static class MyServerConfiguration {
-
 		@Bean
 		public DefaultEchoService service() {
 			return new DefaultEchoService();
 		}
-
 
 		@Bean
 		public EventLoopFactoryBean eventLoopFactoryBean() throws Exception {
