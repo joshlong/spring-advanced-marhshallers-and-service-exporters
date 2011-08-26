@@ -23,7 +23,7 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.apache.thrift.transport.TTransport;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.http.converter.thrift.ThriftHttpMessageConverter;
+import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.HttpRequestHandler;
 
@@ -82,8 +82,14 @@ public class ThriftServiceExporter extends AbstractThriftExporter implements Ini
 
     private final Collection<Map.Entry<String, String>> customHeaders = new ArrayList<Map.Entry<String, String>>();
 
+    private MediaType mediaType;
+
     public void setProtocolFactory(TProtocolFactory inProtocolFactory) {
         this.protocolFactory = inProtocolFactory;
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
     }
 
     public void addCustomHeader(String k, String v) {
@@ -98,9 +104,19 @@ public class ThriftServiceExporter extends AbstractThriftExporter implements Ini
     }
 
     @Override
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        Assert.notNull(this.protocolFactory, "the 'protocolFactory' can't be null");
+    }
+
+    @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            response.setContentType(ThriftHttpMessageConverter.MEDIA_TYPE_STRING);
+
+            if (null != mediaType) {
+                response.setContentType(mediaType.toString());
+            }
+
             if (null != this.customHeaders) {
                 for (Map.Entry<String, String> header : this.customHeaders) {
                     response.addHeader(header.getKey(), header.getValue());
@@ -117,11 +133,5 @@ public class ThriftServiceExporter extends AbstractThriftExporter implements Ini
         } catch (TException te) {
             throw new ServletException(te);
         }
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        Assert.notNull(this.protocolFactory, "the 'protocolFactory' can't be null");
     }
 }

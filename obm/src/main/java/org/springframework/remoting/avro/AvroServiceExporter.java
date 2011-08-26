@@ -17,7 +17,6 @@ package org.springframework.remoting.avro;
 
 import org.apache.avro.ipc.ResponderRequestHandlerUtils;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.avro.AvroHttpMessageConverter;
 import org.springframework.util.Assert;
 import org.springframework.web.HttpRequestHandler;
 
@@ -40,7 +39,7 @@ import java.io.IOException;
  */
 public class AvroServiceExporter extends AbstractAvroExporter implements HttpRequestHandler {
 
-    private MediaType mediaType = AvroHttpMessageConverter.MEDIA_TYPE;
+    private MediaType mediaType = new MediaType("avro", "binary");
 
     public void setMediaType(MediaType mediaType) {
         this.mediaType = mediaType;

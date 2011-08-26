@@ -24,11 +24,12 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
 
     private Marshaller marshaller;
     private Unmarshaller unmarshaller;
-    private Class <?> payloadClass ;
+    private Class<?> payloadClass;
 
     public void setPayloadClass(Class<?> payloadClass) {
         this.payloadClass = payloadClass;
     }
+
     public void setMarshaller(Marshaller marshaller) {
         this.marshaller = marshaller;
     }
@@ -51,7 +52,7 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
             Assert.isInstanceOf(BytesMessage.class, message);
             if (message instanceof BytesMessage) {
                 BytesMessage bytesMessage = (BytesMessage) message;
-                return unmarshalFromBytesMessage( this.payloadClass, bytesMessage, this.unmarshaller);
+                return unmarshalFromBytesMessage(this.payloadClass, bytesMessage, this.unmarshaller);
             }
 
         } catch (IOException ex) {
@@ -62,17 +63,17 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(this.payloadClass,  "the payload class can't be null");
+        Assert.notNull(this.payloadClass, "the payload class can't be null");
         Assert.notNull(this.marshaller, "Property 'marshaller' is required");
         Assert.notNull(this.unmarshaller, "Property 'unmarshaller' is required");
     }
 
 
-    protected Object unmarshalFromBytesMessage ( Class clzz,BytesMessage message, org.springframework.obm.Unmarshaller unmarshaller) throws JMSException, IOException, XmlMappingException {
+    protected Object unmarshalFromBytesMessage(Class clzz, BytesMessage message, org.springframework.obm.Unmarshaller unmarshaller) throws JMSException, IOException, XmlMappingException {
         byte[] bytes = new byte[(int) message.getBodyLength()];
         message.readBytes(bytes);
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        return unmarshaller.unmarshal(  clzz, bis);
+        return unmarshaller.unmarshal(clzz, bis);
     }
 
     protected BytesMessage marshalToBytesMessage(Object object, Session session, org.springframework.obm.Marshaller marshaller) throws JMSException, IOException, XmlMappingException {

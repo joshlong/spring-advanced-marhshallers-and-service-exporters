@@ -12,6 +12,7 @@ import org.springframework.obm.Unmarshaller;
  */
 abstract public class AbstractMarshaller<T> implements Marshaller<T>, Unmarshaller <T>{
 
+
     protected Log log = LogFactory.getLog(getClass());
 
 

@@ -66,7 +66,7 @@ public class AvroHttpMessageConverterTest {
 		customer.lastName = "Long";
 		customer.email = "josh@emai.com";
 
-		schema = new SchemaFactoryBean(Customer.class).getObject();
+
 
 	}
 
