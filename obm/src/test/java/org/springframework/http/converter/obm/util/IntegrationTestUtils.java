@@ -34,26 +34,20 @@ import java.util.Map;
  */
 public class IntegrationTestUtils {
 
-    // holder for the
     static private Map<AbstractRestServiceConfiguration, BeanFactory> beanFactoryMap = new ConcurrentHashMap<AbstractRestServiceConfiguration, BeanFactory>();
 
     public static RestTemplate exposeRestfulService(Class<? extends AbstractRestServiceConfiguration> clazz) throws Throwable {
-        DispatcherServletJettyConfigurationCallback c = new DispatcherServletJettyConfigurationCallback(clazz);
-
-        Server server = EndpointTestUtils.serve(c);
+        DispatcherServletJettyConfigurationCallback configurationCallback = new DispatcherServletJettyConfigurationCallback(clazz);
+        Server server = EndpointTestUtils.serve(configurationCallback);
         server.start();
-
-        // let things get settled on the server
-//        Thread.sleep(1000 * 2);
-
-       BeanFactory beanFactory = beanFactoryMap.values().iterator().next();
-       RestTemplate restTemplate = beanFactory.getBean(RestTemplate.class);
-
-       return restTemplate;
+        BeanFactory beanFactory = beanFactoryMap.values().iterator().next();
+        return beanFactory.getBean(RestTemplate.class);
     }
 
     // hackety hackety
-    static public class BeanFactoryExporter implements ApplicationContextAware {
+    // to keep our end of the bargain we need a correctly configured RestTemplate.
+    // so we let Spring configure it and then simply 'export' it so i can get access it
+    public static class BeanFactoryExporter implements ApplicationContextAware {
         private AbstractRestServiceConfiguration abstractRestServiceConfiguration;
 
         public BeanFactoryExporter(AbstractRestServiceConfiguration abstractRestServiceConfiguration) {
@@ -69,10 +63,11 @@ public class IntegrationTestUtils {
 
     /**
      * Abstract template class. Clients may extend this class and then fill out the
-     * definitions for the salient parts
+     * definitions for the salient parts.
+     *
+     * @author Josh Long
      */
-
-    abstract public static class AbstractRestServiceConfiguration extends WebMvcConfigurerAdapter {
+    public abstract static class AbstractRestServiceConfiguration extends WebMvcConfigurerAdapter {
 
         abstract public Marshaller getMarshaller();
 
@@ -82,9 +77,6 @@ public class IntegrationTestUtils {
 
         @Bean
         public BeanFactoryExporter rtExporter() {
-            if (log.isDebugEnabled()) {
-                log.debug("launching the rtExporter");
-            }
             return new BeanFactoryExporter(this);
         }
 
@@ -107,12 +99,6 @@ public class IntegrationTestUtils {
             return mc;
         }
 
-        /*     @Bean
-                public BeanNameUrlHandlerMapping beanNameUrlHandlerMapping() {
-                    BeanNameUrlHandlerMapping beanNameUrlHandlerMapping = new BeanNameUrlHandlerMapping();
-                    return beanNameUrlHandlerMapping;
-                }
-        */
         @Override
         public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
             converters.add(messageConverter());

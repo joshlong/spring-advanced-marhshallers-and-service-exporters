@@ -16,6 +16,7 @@
 
 package org.springframework.http.converter.obm;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
@@ -55,37 +56,43 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
     @Before
     public void before() throws Throwable {
-
         ThriftMarshaller marshaller = new ThriftMarshaller();
-
         marshaller.afterPropertiesSet();
-
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
         setMediaType(MEDIA_TYPE);
-
         MarshallingHttpMessageConverter converter = new MarshallingHttpMessageConverter(marshaller);
         converter.setSupportedMediaTypes(Arrays.asList(MEDIA_TYPE));
         setHttpMessageConverter(converter);
     }
 
-    // this is more of a mock test
     @Test
     public void testHttpReading() throws Throwable {
         doTestHttpWriting(customer.getClass(), customer);
     }
 
+    @Test
+    public void testSimpleIntegration() throws Throwable {
+        RestTemplate rt = IntegrationTestUtils.exposeRestfulService(MyService.class);
+        Assert.assertNotNull(rt);
+        String url = "http://localhost:8080/" + ("ws/customers/{customerId}".startsWith("/") ? "" : "/") + "ws/customers/{customerId}";
+
+        Map<String, Object> mapOfVars = new HashMap<String, Object>();
+        mapOfVars.put("customerId", 3);
+        Customer customer = rt.getForEntity(url, Customer.class, mapOfVars).getBody();
+
+        Assert.assertNotNull(customer.getFirstName());
+        Assert.assertNotNull(customer.getLastName());
+        Assert.assertNotNull(customer.getEmail());
+
+        if (log.isDebugEnabled()) {
+            log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
+        }
+    }
+
     @Configuration
     @EnableWebMvc
     static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
-        private Log log = LogFactory.getLog(getClass());
-
-        @Override
-        public Marshaller getMarshaller() {
-            ThriftMarshaller marshaller = new ThriftMarshaller();
-            return marshaller;
-        }
-
         @Bean
         public CrmRestController controller() {
             return new CrmRestController();
@@ -94,113 +101,25 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
         @Bean
         public ThriftCrmService crmService() {
             return new ThriftCrmService();
+        }
 
+        @Override
+        public Marshaller getMarshaller() {
+            return new ThriftMarshaller();
         }
 
         @Override
         public MediaType getMediaType() {
             return MEDIA_TYPE;
         }
-
-
-        /*
-        *//*
-               @Bean
-               public Object rtExporter() {
-                   if(log.isDebugEnabled()) log.debug( "launching the rtExporter");
-                   return new IntegrationTestUtils.BeanFactoryExporter(this);
-               }
-*//*
-
-        // todo remove this
-*//*@Bean
-	public MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter() {
-		MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-		mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-		return mappingJacksonHttpMessageConverter;
-	}*//*
-
-               @Bean
-               public Marshaller marshaller() {
-                   return getMarshaller();
-               }
-
-               @Bean
-               public HttpMessageConverter messageConverter() {
-                   MarshallingHttpMessageConverter mc = new MarshallingHttpMessageConverter(this.marshaller());
-                   mc.setSupportedMediaTypes(Arrays.asList(getMediaType() ));
-                   return mc;
-               }
-
-               @Bean public BeanNameUrlHandlerMapping beanNameUrlHandlerMapping (){
-                   BeanNameUrlHandlerMapping beanNameUrlHandlerMapping = new BeanNameUrlHandlerMapping ();
-                   return beanNameUrlHandlerMapping;
-
-               }
-
-
-        @Bean public
-        CrmRestController   controller (){
-            CrmRestController  controller =new CrmRestController  () ;
-            return controller;
-
-        }
-*//*
-               @Bean   (name = "/ws/")
-               public Object restController() {
-                   return getRestController();
-               }*//*
-
-               @Bean
-               public RestTemplate restTemplate() {
-                   RestTemplate restTemplate = new RestTemplate();
-                   restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(messageConverter()));
-                   restTemplate.setInterceptors(new ClientHttpRequestInterceptor[]{new DebugClientHttpRequestInterceptor(getMediaType())});
-                   return restTemplate;
-               }
-
-
-        @Bean
-        public ThriftCrmService crmService() {
-            return new ThriftCrmService();
-        }*/
-
-
     }
 
-    /* @Configuration
-    public static class CommonConfiguration {
 
-        @Bean
-        public MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter() {
-            MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-            mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-            return mappingJacksonHttpMessageConverter;
-        }
-
-        @Bean
-        public ThriftMarshaller thriftMarshaller() {
-            return new ThriftMarshaller();
-        }
-
-        @Bean
-        public MarshallingHttpMessageConverter messagePackHttpMessageConverter() {
-            MarshallingHttpMessageConverter mc = new MarshallingHttpMessageConverter(thriftMarshaller());
-            mc.setSupportedMediaTypes(Arrays.asList(ThriftHttpMessageConverterTest.MEDIA_TYPE));
-            return mc;
-        }
-
-        public List<HttpMessageConverter<?>> messageConverters() {
-            return Arrays.<HttpMessageConverter<?>>asList(mappingJacksonHttpMessageConverter(), messagePackHttpMessageConverter());
-        }
-    }*/
     @Controller
-    @RequestMapping(value = "/ws/") //  , headers = "Accept=application/xml") //, headers = HotelsRestController.acceptHeader)
+    @RequestMapping(value = "/ws/")
     public static class CrmRestController {
 
         @Inject private ThriftCrmService crmService;
-
-        private Log log = LogFactory.getLog(getClass());
 
         @RequestMapping(value = "/customers/{id}", method = RequestMethod.GET)
         @ResponseBody
@@ -208,108 +127,5 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
             return crmService.getCustomerById(id);
         }
     }
-
-    @Test
-    public void testSimpleIntegration() throws Throwable {
-        RestTemplate rt = IntegrationTestUtils.exposeRestfulService(MyService.class);
-        Assert.assertNotNull(rt);
-        String url = buildServiceUrl("ws/customers/{customerId}");
-
-        Map<String, Object> mapOfVars = new HashMap<String, Object>();
-        mapOfVars.put("customerId", 3);
-        Customer customer = rt.getForEntity(url, Customer.class, mapOfVars).getBody();
-
-        //System.in.read() ;
-/*
-        System.in.read() ;
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
-        RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
-
-        String url = buildServiceUrl("ws/customers/{customerId}");
-
-        Map<String, Object> mapOfVars = new HashMap<String, Object>();
-        mapOfVars.put("customerId", 3);
-
-        try {
-            Customer customer = restTemplate.getForEntity(url, Customer.class, mapOfVars).getBody();
-
-        } catch (Throwable t) {
-            ///
-        }*/
-
-
-    }
-
-/*
-
-    @Test
-    public void testIntegrationWithRest() throws Throwable {
-        DispatcherServletJettyConfigurationCallback callback = new DispatcherServletJettyConfigurationCallback(RestConfiguration.class);
-        Server server = EndpointTestUtils.serve(callback);
-        server.start();
-
-
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ClientConfiguration.class);
-        RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
-
-        String url = buildServiceUrl("/customers/{customerId}");
-
-        Map<String, Object> mapOfVars = new HashMap<String, Object>();
-        mapOfVars.put("customerId", 3);
-
-        Customer customer = restTemplate.getForEntity(url, Customer.class, mapOfVars).getBody();
-        log.info("response payload: " + ToStringBuilder.reflectionToString(customer));
-        restTemplate.execute(url, HttpMethod.GET, null, new DebuggingResponseExtractor(), mapOfVars);
-    }
-*/
-
-    private String buildServiceUrl(String prefix) {
-        return "http://localhost:8080/" + (prefix.startsWith("/") ? "" : "/") + prefix;
-    }
-
-/*
-    @Configuration
-    @Import(CommonConfiguration.class)
-    public static class ClientConfiguration {
-
-        @Inject private CommonConfiguration commonConfiguration;
-
-        @Bean
-        public RestTemplate restTemplate() {
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(commonConfiguration.messagePackHttpMessageConverter()));
-            restTemplate.setInterceptors(new ClientHttpRequestInterceptor[]{new DebugClientHttpRequestInterceptor(ThriftHttpMessageConverterTest.MEDIA_TYPE)});
-            return restTemplate;
-        }
-    }*/
 }
 
-
-/*
-
-    @Configuration
-    @Import(CommonConfiguration.class)
-    @EnableWebMvc
-    public static class RestConfiguration extends WebMvcConfigurerAdapter {
-
-        @Inject private CommonConfiguration commonConfiguration;
-
-        @Override
-        public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-            for (HttpMessageConverter<?> mc : commonConfiguration.messageConverters()) {
-                converters.add(mc);
-            }
-        }
-
-        @Bean
-        public ThriftCrmService crmService() {
-            return new ThriftCrmService();
-        }
-
-        @Bean
-        public CrmRestController crmController() {
-            return new CrmRestController();
-        }
-
-    }
-*/
