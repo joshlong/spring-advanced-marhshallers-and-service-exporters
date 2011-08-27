@@ -32,7 +32,7 @@ import org.springframework.obm.thrift.ThriftCrmService;
 import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.http.IntegrationTestUtils;
+import org.springframework.util.http.RestIntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -75,7 +75,7 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
     @Test
     public void testSimpleIntegration() throws Throwable {
-        IntegrationTestUtils.startServiceAndConnect(MyService.class, new IntegrationTestUtils.ServerExecutionCallback() {
+        RestIntegrationTestUtils.startServiceAndConnect(MyService.class, new RestIntegrationTestUtils.ServerExecutionCallback() {
             @Override
             public void doWithServer(RestTemplate clientRestTemplate, Server server) throws Throwable {
 
@@ -98,7 +98,7 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
     @Configuration
     @EnableWebMvc
-    static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
+    static public class MyService extends RestIntegrationTestUtils.AbstractRestServiceConfiguration {
         @Bean
         public CrmRestController controller() {
             return new CrmRestController();

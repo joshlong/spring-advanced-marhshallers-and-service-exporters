@@ -30,7 +30,7 @@ import org.springframework.obm.Marshaller;
 import org.springframework.obm.avro.AvroMarshaller;
 import org.springframework.obm.avro.crm.Customer;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.http.IntegrationTestUtils;
+import org.springframework.util.http.RestIntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -78,7 +78,7 @@ public class AvroHttpMessageConverterTest extends BaseMarshallingHttpMessageConv
 
     @Test
     public void testSimpleIntegration() throws Throwable {
-        IntegrationTestUtils.startServiceAndConnect(MyService.class, new IntegrationTestUtils.ServerExecutionCallback() {
+        RestIntegrationTestUtils.startServiceAndConnect(MyService.class, new RestIntegrationTestUtils.ServerExecutionCallback() {
             @Override
             public void doWithServer(RestTemplate restTemplate, Server server) throws Throwable {
                 Assert.assertNotNull(restTemplate);
@@ -104,7 +104,7 @@ public class AvroHttpMessageConverterTest extends BaseMarshallingHttpMessageConv
 
     @Configuration
     @EnableWebMvc
-    static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
+    static public class MyService extends RestIntegrationTestUtils.AbstractRestServiceConfiguration {
         @Bean
         public CustomerController controller() {
             return new CustomerController();

@@ -19,7 +19,7 @@ import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.util.http.DispatcherServletJettyConfigurationCallback;
 import org.springframework.util.http.EndpointTestUtils;
-import org.springframework.util.http.IntegrationTestUtils;
+import org.springframework.util.http.RestIntegrationTestUtils;
 import org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping;
 
 import java.util.Arrays;
@@ -52,7 +52,7 @@ public class TestThriftServiceExporter {
     @After
     public void after() throws Throwable {
 
-        IntegrationTestUtils.stopServerQuietly(this.jettyServer);
+        RestIntegrationTestUtils.stopServerQuietly(this.jettyServer);
         if (log.isDebugEnabled()) {
             log.debug("stopped jetty server");
         }

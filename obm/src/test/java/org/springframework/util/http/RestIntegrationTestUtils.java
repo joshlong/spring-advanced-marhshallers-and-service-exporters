@@ -31,14 +31,14 @@ import java.util.Map;
  *
  * @author Josh Long
  */
-public class IntegrationTestUtils {
+public class RestIntegrationTestUtils {
     public static interface
             ServerExecutionCallback {
         void doWithServer(RestTemplate restTemplate, Server server) throws Throwable;
     }
 
 
-    static Log log = LogFactory.getLog(IntegrationTestUtils.class);
+    static Log log = LogFactory.getLog(RestIntegrationTestUtils.class);
 
     static private Map<AbstractRestServiceConfiguration, BeanFactory> beanFactoryMap = new ConcurrentHashMap<AbstractRestServiceConfiguration, BeanFactory>();
 

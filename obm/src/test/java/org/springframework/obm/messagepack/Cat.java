@@ -50,6 +50,14 @@ public class Cat {
     }
 
     @Override
+    public String toString() {
+        return "Cat{" +
+                       "name='" + name + '\'' +
+                       ", id=" + id +
+                       '}';
+    }
+
+    @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + id;
