@@ -1,3 +1,8 @@
+Notes on other things to potentially support:
+ -- google snappy compression support
+ -- jboss remoting endpoint
+ -- edmunds' particular version of thrift?
+
 If you're new to Thrift, then you might check the apache website to see if they've yet finished that tutorial (doubt it.)
 
 Here's one that's quite good: http://www.thrift.pl/Thrift-tutorial-installation.html

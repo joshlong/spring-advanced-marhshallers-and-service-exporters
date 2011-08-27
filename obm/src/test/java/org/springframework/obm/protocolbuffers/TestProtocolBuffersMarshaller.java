@@ -7,6 +7,9 @@ import org.junit.Test;
 import org.springframework.obm.BaseMarshallerTest;
 import org.springframework.obm.protocolbuffers.crm.Crm;
 
+/**
+ * @author Josh Long
+ */
 public class TestProtocolBuffersMarshaller extends BaseMarshallerTest<Crm.Customer> {
 
     private Crm.Customer customer;

@@ -35,6 +35,7 @@ public class DispatcherServletJettyConfigurationCallback implements EndpointTest
         ServletHolder holder = new ServletHolder(DispatcherServlet.class);
         holder.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
         holder.setInitParameter("contextConfigLocation", configurationClass.getName());
+        holder.setInitOrder(1);
         context.addServlet(holder, this.servletPrefix);
     }
 }
