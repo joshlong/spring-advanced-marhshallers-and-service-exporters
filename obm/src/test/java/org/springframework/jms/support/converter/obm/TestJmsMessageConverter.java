@@ -25,7 +25,6 @@ public class TestJmsMessageConverter {
     private ThriftMarshaller thriftMarshaller = new ThriftMarshaller();
     private org.springframework.obm.thrift.crm.Customer thriftCustomer = new org.springframework.obm.thrift.crm.Customer("John", "Doe", "email@email.com", 22);
 
-
     // messagepack
     private MessagePackMarshaller msgPackMarshaller = new MessagePackMarshaller();
     private Cat msgPackCat;
@@ -33,6 +32,7 @@ public class TestJmsMessageConverter {
     // protocol buffers
     private ProtocolBuffersMarshaller buffersMarshaller = new ProtocolBuffersMarshaller();
     private Crm.Customer buffersCustomer;
+
     // avro
     private AvroMarshaller avroMarshaller = new AvroMarshaller();
     private Customer avroCustomer = new Customer();
@@ -65,7 +65,7 @@ public class TestJmsMessageConverter {
                 jmsTemplate.convertAndSend(avroDestination, thriftCustomer);
 
                 org.springframework.obm.thrift.crm.Customer customerReceived =
-                     (org.springframework.obm.thrift.crm.Customer) jmsTemplate.receiveAndConvert(avroDestination);
+                        (org.springframework.obm.thrift.crm.Customer) jmsTemplate.receiveAndConvert(avroDestination);
                 Assert.assertEquals(thriftCustomer, customerReceived);
             }
         });
