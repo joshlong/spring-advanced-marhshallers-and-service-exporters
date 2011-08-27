@@ -1,4 +1,4 @@
-package org.springframework.util;
+package org.springframework.util.http;
 
 import org.mortbay.jetty.servlet.Context;
 

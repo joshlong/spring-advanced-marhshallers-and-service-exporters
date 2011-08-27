@@ -32,7 +32,7 @@ import org.springframework.obm.thrift.ThriftCrmService;
 import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.IntegrationTestUtils;
+import org.springframework.util.http.IntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

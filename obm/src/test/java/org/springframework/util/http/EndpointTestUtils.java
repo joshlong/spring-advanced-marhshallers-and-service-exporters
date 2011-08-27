@@ -1,8 +1,9 @@
-package org.springframework.util;
+package org.springframework.util.http;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
+import org.springframework.util.Assert;
 
 /**
  * provides support for launching a Jetty {@link Server} instance. Users may implement {@link JettyContextConfigurationCallback}

@@ -30,7 +30,7 @@ import org.springframework.obm.Marshaller;
 import org.springframework.obm.avro.AvroMarshaller;
 import org.springframework.obm.avro.crm.Customer;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.IntegrationTestUtils;
+import org.springframework.util.http.IntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

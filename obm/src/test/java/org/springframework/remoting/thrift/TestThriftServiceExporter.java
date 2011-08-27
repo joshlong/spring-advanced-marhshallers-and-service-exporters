@@ -17,9 +17,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
-import org.springframework.util.DispatcherServletJettyConfigurationCallback;
-import org.springframework.util.EndpointTestUtils;
-import org.springframework.util.IntegrationTestUtils;
+import org.springframework.util.http.DispatcherServletJettyConfigurationCallback;
+import org.springframework.util.http.EndpointTestUtils;
+import org.springframework.util.http.IntegrationTestUtils;
 import org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping;
 
 import java.util.Arrays;
