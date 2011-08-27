@@ -1,8 +1,7 @@
 package org.springframework.http.converter.obm.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.util.internal.ConcurrentHashMap;
+import org.junit.Assert;
 import org.mortbay.jetty.Server;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -22,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,30 +36,35 @@ public class IntegrationTestUtils {
 
     static private Map<AbstractRestServiceConfiguration, BeanFactory> beanFactoryMap = new ConcurrentHashMap<AbstractRestServiceConfiguration, BeanFactory>();
 
-    public static RestTemplate exposeRestfulService(Class<? extends AbstractRestServiceConfiguration> clazz) throws Throwable {
+
+    public static boolean stopServerQuietly(Server server) throws Throwable {
+        Assert.assertNotNull(server);
+
+        if (!server.isStopped()) {
+            server.stop();
+        }
+        while (!server.isStopped()) {
+            Thread.sleep(500);
+        }
+
+        Thread.sleep(1000 *3);
+        return true;
+    }
+
+    public static Map<RestTemplate, Server> startServiceAndConnect(Class<? extends AbstractRestServiceConfiguration> clazz) throws Throwable {
         DispatcherServletJettyConfigurationCallback configurationCallback = new DispatcherServletJettyConfigurationCallback(clazz);
         Server server = EndpointTestUtils.serve(configurationCallback);
         server.start();
         BeanFactory beanFactory = beanFactoryMap.values().iterator().next();
-        return beanFactory.getBean(RestTemplate.class);
+        Assert.assertNotNull(beanFactory);
+        RestTemplate restTemplate = beanFactory.getBean(RestTemplate.class);
+        Assert.assertNotNull(restTemplate);
+
+        Map<RestTemplate, Server> tuple = new HashMap<RestTemplate, Server>();
+        tuple.put(restTemplate, server);
+        return tuple;
     }
 
-    // hackety hackety
-    // to keep our end of the bargain we need a correctly configured RestTemplate.
-    // so we let Spring configure it and then simply 'export' it so i can get access it
-    public static class BeanFactoryExporter implements ApplicationContextAware {
-        private AbstractRestServiceConfiguration abstractRestServiceConfiguration;
-
-        public BeanFactoryExporter(AbstractRestServiceConfiguration abstractRestServiceConfiguration) {
-            this.abstractRestServiceConfiguration = abstractRestServiceConfiguration;
-        }
-
-        @Override
-        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-            beanFactoryMap.put(this.abstractRestServiceConfiguration, applicationContext);
-        }
-
-    }
 
     /**
      * Abstract template class. Clients may extend this class and then fill out the
@@ -73,11 +78,14 @@ public class IntegrationTestUtils {
 
         abstract public MediaType getMediaType();
 
-        private Log log = LogFactory.getLog(getClass());
-
-        @Bean
-        public BeanFactoryExporter rtExporter() {
-            return new BeanFactoryExporter(this);
+        @Bean // hackety hackety
+        public ApplicationContextAware applicationContextExporter() {
+            return new ApplicationContextAware() {
+                @Override
+                public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+                    beanFactoryMap.put(AbstractRestServiceConfiguration.this, applicationContext);
+                }
+            };
         }
 
         @Bean

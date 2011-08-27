@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.obm.util.IntegrationTestUtils;
 import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.util.DispatcherServletJettyConfigurationCallback;
@@ -39,7 +40,7 @@ public class TestThriftServiceExporter {
 
     private Server jettyServer;
 
-    @Before
+   @Before
     public void before() throws Throwable {
         jettyServer = EndpointTestUtils.serve(new DispatcherServletJettyConfigurationCallback(ExporterConfiguration.class));
         jettyServer.start();
@@ -51,7 +52,7 @@ public class TestThriftServiceExporter {
     @After
     public void after() throws Throwable {
 
-        jettyServer.stop();
+        IntegrationTestUtils.stopServerQuietly(this.jettyServer);
         if (log.isDebugEnabled()) {
             log.debug("stopped jetty server");
         }
@@ -77,6 +78,9 @@ public class TestThriftServiceExporter {
         Assert.assertEquals(customer.getEmail(), email);
         Assert.assertTrue(customer.getId() > 0);
     }
+
+
+
 }
 
 /**

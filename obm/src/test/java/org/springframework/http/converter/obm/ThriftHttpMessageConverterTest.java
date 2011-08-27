@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mortbay.jetty.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -73,14 +74,16 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
     @Test
     public void testSimpleIntegration() throws Throwable {
-        RestTemplate rt = IntegrationTestUtils.exposeRestfulService(MyService.class);
-        Assert.assertNotNull(rt);
-        String url = "http://localhost:8080/" + ("ws/customers/{customerId}".startsWith("/") ? "" : "/") + "ws/customers/{customerId}";
+        Map<RestTemplate, Server> tupleOfClientAndServer = IntegrationTestUtils.startServiceAndConnect(MyService.class);
+        RestTemplate clientRestTemplate = tupleOfClientAndServer.keySet().iterator().next();
+        Server server = tupleOfClientAndServer.values().iterator().next();
+
+        Assert.assertNotNull(clientRestTemplate);
 
         Map<String, Object> mapOfVars = new HashMap<String, Object>();
         mapOfVars.put("customerId", 3);
-        Customer customer = rt.getForEntity(url, Customer.class, mapOfVars).getBody();
 
+        Customer customer = clientRestTemplate.getForEntity("http://localhost:8080/ws/customers/{customerId}", Customer.class, mapOfVars).getBody();
         Assert.assertNotNull(customer.getFirstName());
         Assert.assertNotNull(customer.getLastName());
         Assert.assertNotNull(customer.getEmail());
@@ -88,6 +91,8 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
         if (log.isDebugEnabled()) {
             log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
         }
+
+       IntegrationTestUtils.stopServerQuietly(server ) ;
     }
 
     @Configuration
