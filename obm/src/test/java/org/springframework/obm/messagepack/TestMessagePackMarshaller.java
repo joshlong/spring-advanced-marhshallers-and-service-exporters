@@ -16,7 +16,7 @@ public class TestMessagePackMarshaller extends BaseMarshallerTest<Cat> {
     @Before
     public void before() throws Throwable {
 
-        cat.setAge(4);
+        cat.setId(4);
         cat.setName("Felix");
 
         MessagePackMarshaller<Cat> messagePackMarshaller = new MessagePackMarshaller<Cat>();

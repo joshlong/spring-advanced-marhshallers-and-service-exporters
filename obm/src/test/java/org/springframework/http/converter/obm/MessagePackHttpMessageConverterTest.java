@@ -16,22 +16,45 @@
 
 package org.springframework.http.converter.obm;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mortbay.jetty.Server;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.obm.support.BaseMarshallingHttpMessageConverterTest;
+import org.springframework.obm.Marshaller;
 import org.springframework.obm.messagepack.Cat;
 import org.springframework.obm.messagepack.MessagePackMarshaller;
+import org.springframework.obm.thrift.ThriftMarshaller;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.IntegrationTestUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Josh Long
  */
 public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMessageConverterTest {
 
+    static  MediaType MEDIA_TYPE = new MediaType("application", "x-msgpack") ;
+    private Log log = LogFactory.getLog(getClass()) ;
     private Cat cat = new Cat();
 
     @Before
     public void before() throws Throwable {
-        cat.setAge(4);
+        cat.setId(4);
         cat.setName("Felix");
 
         MessagePackMarshaller marshaller = new MessagePackMarshaller();
@@ -39,7 +62,7 @@ public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMess
 
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
-        setMediaType(new MediaType("application", "x-msgpack"));
+        setMediaType(MEDIA_TYPE);
         MarshallingHttpMessageConverter converter = new MarshallingHttpMessageConverter(marshaller);
         setHttpMessageConverter(converter);
     }
@@ -47,6 +70,62 @@ public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMess
     @Test
     public void testHttpReading() throws Throwable {
         doTestHttpWriting(cat.getClass(), cat);
+    }
+
+
+    @Test
+    public void testSimpleIntegration() throws Throwable {
+        IntegrationTestUtils.startServiceAndConnect(MyService.class , new IntegrationTestUtils.ServerExecutionCallback(){
+            @Override
+            public void doWithServer(RestTemplate clientRestTemplate, Server server) throws Throwable {
+
+                Assert.assertNotNull(clientRestTemplate);
+
+                int id = 344;
+                Map<String, Object> mapOfVars = new HashMap<String, Object>();
+                mapOfVars.put("cat", id);
+
+                Cat customer = clientRestTemplate.getForEntity("http://localhost:8080/ws/cats/{cat}", Cat.class, mapOfVars).getBody();
+                Assert.assertTrue(customer.getId() == id);
+                Assert.assertNotNull(customer.getName());
+
+                if (log.isDebugEnabled()) {
+                    log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
+                }
+
+            }
+        });
+
+    }
+
+    @Configuration
+    @EnableWebMvc
+    static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
+        @Bean
+        public CatController  controller() {
+            return new CatController();
+        }
+
+        @Override
+        public Marshaller getMarshaller() {
+            return new MessagePackMarshaller();
+        }
+
+        @Override
+        public MediaType getMediaType() {
+            return MEDIA_TYPE;
+        }
+    }
+
+
+    @Controller
+    @RequestMapping(value = "/ws/")
+    public static class CatController {
+        @RequestMapping(value = "/cats/{id}", method = RequestMethod.GET)
+        @ResponseBody
+        public Cat  customer(@PathVariable("id") int id) {
+            return  new Cat(Math.random() > .5 ? "Felix" :"Garfield",id);
+        }
     }
 }
 

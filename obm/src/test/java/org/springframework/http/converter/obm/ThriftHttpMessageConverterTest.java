@@ -26,12 +26,13 @@ import org.mortbay.jetty.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.util.IntegrationTestUtils;
+import org.springframework.http.converter.obm.support.BaseMarshallingHttpMessageConverterTest;
 import org.springframework.obm.Marshaller;
 import org.springframework.obm.thrift.ThriftCrmService;
 import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.IntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,25 +75,25 @@ public class ThriftHttpMessageConverterTest extends BaseMarshallingHttpMessageCo
 
     @Test
     public void testSimpleIntegration() throws Throwable {
-        Map<RestTemplate, Server> tupleOfClientAndServer = IntegrationTestUtils.startServiceAndConnect(MyService.class);
-        RestTemplate clientRestTemplate = tupleOfClientAndServer.keySet().iterator().next();
-        Server server = tupleOfClientAndServer.values().iterator().next();
+        IntegrationTestUtils.startServiceAndConnect(MyService.class, new IntegrationTestUtils.ServerExecutionCallback() {
+            @Override
+            public void doWithServer(RestTemplate clientRestTemplate, Server server) throws Throwable {
 
-        Assert.assertNotNull(clientRestTemplate);
+                Assert.assertNotNull(clientRestTemplate);
 
-        Map<String, Object> mapOfVars = new HashMap<String, Object>();
-        mapOfVars.put("customerId", 3);
+                Map<String, Object> mapOfVars = new HashMap<String, Object>();
+                mapOfVars.put("customerId", 3);
 
-        Customer customer = clientRestTemplate.getForEntity("http://localhost:8080/ws/customers/{customerId}", Customer.class, mapOfVars).getBody();
-        Assert.assertNotNull(customer.getFirstName());
-        Assert.assertNotNull(customer.getLastName());
-        Assert.assertNotNull(customer.getEmail());
+                Customer customer = clientRestTemplate.getForEntity("http://localhost:8080/ws/customers/{customerId}", Customer.class, mapOfVars).getBody();
+                Assert.assertNotNull(customer.getFirstName());
+                Assert.assertNotNull(customer.getLastName());
+                Assert.assertNotNull(customer.getEmail());
 
-        if (log.isDebugEnabled()) {
-            log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
-        }
-
-       IntegrationTestUtils.stopServerQuietly(server ) ;
+                if (log.isDebugEnabled()) {
+                    log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
+                }
+            }
+        });
     }
 
     @Configuration

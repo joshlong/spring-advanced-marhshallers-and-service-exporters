@@ -5,14 +5,14 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 
 /**
+ * provides support for launching a Jetty {@link Server} instance. Users may implement {@link JettyContextConfigurationCallback}
+ * to tailor the deployed web applications in the Jetty context as required.
+ *
  * @author Josh Long
+ * @see DispatcherServletJettyConfigurationCallback
+ * @see Server
  */
 abstract public class EndpointTestUtils {
-
-
-    public static interface JettyContextConfigurationCallback {
-        void configure(Context c) throws Exception;
-    }
 
     /**
      * Launches a Jetty server and then preconfigures Spring's web infrastructure and the bootstraps the

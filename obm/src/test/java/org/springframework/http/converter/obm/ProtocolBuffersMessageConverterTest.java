@@ -10,6 +10,7 @@ import org.mortbay.jetty.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.obm.support.BaseMarshallingHttpMessageConverterTest;
 import org.springframework.util.IntegrationTestUtils;
 import org.springframework.obm.Marshaller;
 import org.springframework.obm.protocolbuffers.ProtocolBuffersMarshaller;
@@ -61,69 +62,5 @@ public class ProtocolBuffersMessageConverterTest extends BaseMarshallingHttpMess
     public void testHttpReading() throws Throwable {
         doTestHttpWriting(customer.getClass(), this.customer);
     }
-
-    @Test
-    public void testSimpleIntegration() throws Throwable {
-
-        Map<RestTemplate,Server> tupleOfClientAndServer = IntegrationTestUtils.startServiceAndConnect(MyService.class);
-        RestTemplate clientRestTemplate = tupleOfClientAndServer.keySet().iterator().next();
-        Server server = tupleOfClientAndServer.values().iterator().next();
-
-        Assert.assertNotNull(clientRestTemplate);
-
-        Map<String, Object> mapOfVars = new HashMap<String, Object>();
-        mapOfVars.put("customerId", 3);
-
-        Customer customer = clientRestTemplate.getForEntity("http://localhost:8080/ws/customers/{customerId}", Customer.class, mapOfVars).getBody();
-        Assert.assertNotNull(customer.getFirstName());
-        Assert.assertNotNull(customer.getLastName());
-        Assert.assertNotNull(customer.getEmail());
-
-        if (log.isDebugEnabled()) {
-            log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
-        }
-
-      IntegrationTestUtils.stopServerQuietly(server) ;
-    }
-
-    @Configuration
-    @EnableWebMvc
-    static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
-        @Bean
-        public CrmRestController controller() {
-            return new CrmRestController();
-        }
-
-        @Bean
-        public ThriftCrmService crmService() {
-            return new ThriftCrmService();
-        }
-
-        @Override
-        public Marshaller getMarshaller() {
-            return new ThriftMarshaller();
-        }
-
-        @Override
-        public MediaType getMediaType() {
-            return MEDIA_TYPE;
-        }
-    }
-
-    @Controller
-    @RequestMapping(value = "/ws/")
-    public static class CrmRestController {
-
-        @Inject
-        private ThriftCrmService crmService;
-
-        @RequestMapping(value = "/customers/{id}", method = RequestMethod.GET)
-        @ResponseBody
-        public Customer customer(@PathVariable("id") int id) {
-            return crmService.getCustomerById(id);
-        }
-    }
-
-
 }
 

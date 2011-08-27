@@ -12,7 +12,7 @@ import org.springframework.web.servlet.DispatcherServlet;
  *
  * @author Josh Long
  */
-public class DispatcherServletJettyConfigurationCallback implements EndpointTestUtils.JettyContextConfigurationCallback {
+public class DispatcherServletJettyConfigurationCallback implements JettyContextConfigurationCallback {
 
     private Class<?> configurationClass;
 

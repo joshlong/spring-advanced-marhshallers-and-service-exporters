@@ -8,7 +8,7 @@ package org.springframework.obm.messagepack;
 public class Cat {
     private String name;
 
-    private int age;
+    private int id;
 
     public String getName() {
         return name;
@@ -18,17 +18,17 @@ public class Cat {
         this.name = name;
     }
 
-    public int getAge() {
-        return age;
+    public int getId() {
+        return id;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public Cat(String name, int age) {
+    public Cat(String name, int id) {
         this.name = name;
-        this.age = age;
+        this.id = id;
     }
 
     public Cat() {
@@ -45,14 +45,14 @@ public class Cat {
 
         Cat that = (Cat) o;
 
-        return age == that.age && !(name != null ? !name.equals(that.name) : that.name != null);
+        return id == that.id && !(name != null ? !name.equals(that.name) : that.name != null);
 
     }
 
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + age;
+        result = 31 * result + id;
         return result;
     }
 }
