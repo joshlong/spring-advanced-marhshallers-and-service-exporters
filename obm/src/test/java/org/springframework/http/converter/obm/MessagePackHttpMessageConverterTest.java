@@ -30,7 +30,6 @@ import org.springframework.http.converter.obm.support.BaseMarshallingHttpMessage
 import org.springframework.obm.Marshaller;
 import org.springframework.obm.messagepack.Cat;
 import org.springframework.obm.messagepack.MessagePackMarshaller;
-import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.IntegrationTestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,8 +47,8 @@ import java.util.Map;
  */
 public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMessageConverterTest {
 
-    static  MediaType MEDIA_TYPE = new MediaType("application", "x-msgpack") ;
-    private Log log = LogFactory.getLog(getClass()) ;
+    static MediaType MEDIA_TYPE = new MediaType("application", "x-msgpack");
+    private Log log = LogFactory.getLog(getClass());
     private Cat cat = new Cat();
 
     @Before
@@ -75,7 +74,7 @@ public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMess
 
     @Test
     public void testSimpleIntegration() throws Throwable {
-        IntegrationTestUtils.startServiceAndConnect(MyService.class , new IntegrationTestUtils.ServerExecutionCallback(){
+        IntegrationTestUtils.startServiceAndConnect(MyService.class, new IntegrationTestUtils.ServerExecutionCallback() {
             @Override
             public void doWithServer(RestTemplate clientRestTemplate, Server server) throws Throwable {
 
@@ -102,7 +101,7 @@ public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMess
     @EnableWebMvc
     static public class MyService extends IntegrationTestUtils.AbstractRestServiceConfiguration {
         @Bean
-        public CatController  controller() {
+        public CatController controller() {
             return new CatController();
         }
 
@@ -123,8 +122,8 @@ public class MessagePackHttpMessageConverterTest extends BaseMarshallingHttpMess
     public static class CatController {
         @RequestMapping(value = "/cats/{id}", method = RequestMethod.GET)
         @ResponseBody
-        public Cat  customer(@PathVariable("id") int id) {
-            return  new Cat(Math.random() > .5 ? "Felix" :"Garfield",id);
+        public Cat customer(@PathVariable("id") int id) {
+            return new Cat(Math.random() > .5 ? "Felix" : "Garfield", id);
         }
     }
 }

@@ -15,11 +15,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.IntegrationTestUtils;
 import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.util.DispatcherServletJettyConfigurationCallback;
 import org.springframework.util.EndpointTestUtils;
+import org.springframework.util.IntegrationTestUtils;
 import org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping;
 
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class TestThriftServiceExporter {
 
     private Server jettyServer;
 
-   @Before
+    @Before
     public void before() throws Throwable {
         jettyServer = EndpointTestUtils.serve(new DispatcherServletJettyConfigurationCallback(ExporterConfiguration.class));
         jettyServer.start();
@@ -78,7 +78,6 @@ public class TestThriftServiceExporter {
         Assert.assertEquals(customer.getEmail(), email);
         Assert.assertTrue(customer.getId() > 0);
     }
-
 
 
 }

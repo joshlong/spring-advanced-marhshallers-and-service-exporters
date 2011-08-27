@@ -1,34 +1,13 @@
 package org.springframework.http.converter.obm;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.obm.support.BaseMarshallingHttpMessageConverterTest;
-import org.springframework.util.IntegrationTestUtils;
-import org.springframework.obm.Marshaller;
 import org.springframework.obm.protocolbuffers.ProtocolBuffersMarshaller;
 import org.springframework.obm.protocolbuffers.crm.Crm;
-import org.springframework.obm.thrift.ThriftCrmService;
-import org.springframework.obm.thrift.ThriftMarshaller;
-import org.springframework.obm.thrift.crm.Customer;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Simple test of the Google Protocols marshaller with {@link org.springframework.http.converter.HttpMessageConverter}
