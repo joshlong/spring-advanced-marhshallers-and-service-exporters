@@ -1,1 +1,0 @@
-thrift --gen java:java5 -out ../java/ Crm.thrift
