@@ -10,7 +10,7 @@ import org.mortbay.jetty.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.obm.util.IntegrationTestUtils;
+import org.springframework.util.IntegrationTestUtils;
 import org.springframework.obm.Marshaller;
 import org.springframework.obm.protocolbuffers.ProtocolBuffersMarshaller;
 import org.springframework.obm.protocolbuffers.crm.Crm;
@@ -83,7 +83,7 @@ public class ProtocolBuffersMessageConverterTest extends BaseMarshallingHttpMess
             log.debug("response payload: " + ToStringBuilder.reflectionToString(customer));
         }
 
-      IntegrationTestUtils.stopServerQuietly(server ) ;
+      IntegrationTestUtils.stopServerQuietly(server) ;
     }
 
     @Configuration

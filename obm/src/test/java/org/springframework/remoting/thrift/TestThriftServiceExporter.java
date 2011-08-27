@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.obm.util.IntegrationTestUtils;
+import org.springframework.util.IntegrationTestUtils;
 import org.springframework.obm.thrift.crm.Crm;
 import org.springframework.obm.thrift.crm.Customer;
 import org.springframework.util.DispatcherServletJettyConfigurationCallback;
