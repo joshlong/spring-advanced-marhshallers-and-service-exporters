@@ -63,13 +63,13 @@ public class TestJbossRemotingExporter {
             client = new AnnotationConfigApplicationContext(ClientConfiguration.class);
             Crm clientBean = client.getBean(Crm.class);
 
-            long id =8709;
-            Customer customer =clientBean.getCustomerById(id) ;
+            long id = 8709;
+            Customer customer = clientBean.getCustomerById(id);
             Assert.assertNotNull(customer);
-            Assert.assertEquals(customer.getId(), id );
+            Assert.assertEquals(customer.getId(), id);
 
             if (log.isDebugEnabled()) {
-                log.debug( customer.toString());
+                log.debug(customer.toString());
             }
         } finally {
             if (null != client) {
