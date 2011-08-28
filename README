@@ -29,6 +29,8 @@ todo:
   -- Thrift
   -- MessagePack
   -- Google Protocol Buffers 
+  -- Snappy
+  -- FastInfoSet (http://en.wikipedia.org/wiki/Fast_Infoset)
 
  RPC technologies include 
   -- JBoss Remoting
