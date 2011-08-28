@@ -134,7 +134,7 @@ public class MarshallingMessageConverter implements MessageConverter, Initializi
             Object result = unmarshaller.unmarshal(clzz, bis);
             Assert.notNull(result, "the result from the queue is null");
             if (log.isDebugEnabled()) {
-                log.debug("received: " + result );
+                log.debug("received: " + result);
             }
             return result;
         } catch (Exception e) {

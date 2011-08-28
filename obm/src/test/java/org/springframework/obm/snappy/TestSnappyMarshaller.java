@@ -23,12 +23,11 @@ import org.springframework.obm.thrift.ThriftMarshaller;
 import org.springframework.obm.thrift.crm.Customer;
 
 /**
- *
  * Snappy is a compression Marshaller that wraps other Marshallers.
  *
  * @author Josh Long
  */
-public class TestSnappyMarshaller      extends BaseMarshallerTest<Customer> {
+public class TestSnappyMarshaller extends BaseMarshallerTest<Customer> {
 
     private Customer customer = new Customer("Josh", "Long", "josh@email.com", 242);
 
@@ -38,7 +37,7 @@ public class TestSnappyMarshaller      extends BaseMarshallerTest<Customer> {
         ThriftMarshaller<Customer> marshaller = new ThriftMarshaller<Customer>();
         marshaller.afterPropertiesSet();
 
-        SnappyMarshaller snappyMarshaller = new SnappyMarshaller( marshaller);
+        SnappyMarshaller snappyMarshaller = new SnappyMarshaller(marshaller);
 
         setMarshaller(snappyMarshaller);
         setUnmarshaller(snappyMarshaller);
