@@ -246,26 +246,8 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>
-        <!-- <dependency>
-            <groupId>org.jboss.remoting3</groupId>
-            <artifactId>jboss-remoting</artifactId>
-            <version>3.2.0.Beta2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>${logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-processor</artifactId>
-            <version>${logging-tools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.xnio</groupId>
-            <artifactId>xnio-api</artifactId>
-            <version>${xnio.version}</version>
-        </dependency>-->
+
+        <!-- JBoss Remoting! -->
         <dependency>
             <groupId>jboss</groupId>
             <artifactId>jboss-jmx</artifactId>
@@ -291,95 +273,21 @@
             <artifactId>jboss-remoting</artifactId>
             <version>2.5.2</version>
         </dependency>
-           <dependency><groupId>org.jboss</groupId><artifactId>jboss-common-core</artifactId><version>2.2.17.GA</version></dependency>
-        <!--<dependency>
-            <version>6.0.0.Final</version>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-jbossas-remoting</artifactId>
-        </dependency>-->
-
-        <!-- <dependency>
-            <groupId>org.jboss.remoting</groupId><artifactId>jboss-remoting-socket</artifactId><version>2.5.3</version>
-        </dependency>-->
-        <!--<dependency>
-            <version>6.0.0.Final</version>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-jbossas-remoting</artifactId>
-        </dependency>-->
-        <!--  <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-parent</artifactId>
-          <version>7.0.0.Final</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>-->    <!--  <dependency>
-            <version>6.0.0.Final</version>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-jbossas-remoting</artifactId>
-        </dependency>-->
-        <!--
-
-            <dependency>
-              <groupId>org.jboss.as</groupId>
-              <artifactId>jboss-as-parent</artifactId>
-              <version>7.0.0.Final</version>
-              <type>pom</type>
-              <scope>import</scope>
-            </dependency>
-        -->
-
-        <!-- <dependency>
-            <version>6.0.0.Final</version>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-jbossas-remoting</artifactId>
-        </dependency>-->
-        <!--  <dependency>
-            <groupId>org.jboss.remoting</groupId>
-            <artifactId>jboss-remoting-socket</artifactId>
-            <version>2.5.2</version>
-        </dependency>
         <dependency>
-            <groupId>org.jboss.remoting</groupId>
-            <artifactId>jboss-remoting</artifactId>
-            <version>2.5.2</version>
-        </dependency>-->
-        <!--    <dependency>
-            <groupId>org.jboss.remoting</groupId>
-            <artifactId>jboss-remoting-socket</artifactId>
-           <version>2.5.3</version>
-        </dependency>-->
-        <!--  <dependency>
-            <groupId>org.jboss.remoting</groupId>
-            <artifactId>jboss-remoting-core</artifactId>
-            &lt;!&ndash;<version>2.5.0.SP2</version>&ndash;&gt;
-            <version>2.5.3</version>
-        </dependency>-->
-        <!--    <dependency>
-                    <groupId>org.jboss.remoting</groupId>
-                    <artifactId>jboss-remoting-serialization</artifactId>
-                    <version>2.5.0.SP2</version>
-                </dependency>
-        -->
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-common-core</artifactId>
+            <version>2.2.17.GA</version>
+        </dependency>
+         <!-- JBoss Remoting! -->
     </dependencies>
     <repositories>
-        <!--<repository>
-            <id>atlassian</id>
-            <url>http://maven.atlassian.com/content/repositories/jboss-releases</url>
-        </repository>
         <repository>
-            <id>jbr</id>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-        <repository>
-            <id>jbr-deprecated</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/deprecated</url>
-        </repository>-->
-
-        <repository>
-            <id>oldjbr</id>
+            <!-- the 'old' jboss maven repository-->
+            <id>jbr0</id>
             <url>http://repository.jboss.org/</url>
         </repository>
         <repository>
+            <!-- the 'new' jboss maven repository -->
             <id>jbr1</id>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
@@ -391,11 +299,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!--     <repository>
-            <id>jboss-maven2-release-repository</id>
-            <url>https://oss.sonatype.org/content/repositories/JBoss</url>
-        </repository>-->
-
     </repositories>
 
     <pluginRepositories>

@@ -1,66 +1,19 @@
 package org.springframework.remoting.jbr;
 
-import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 public class TestJbossRemotingExporter {
 
-    public static class Customer {
 
-        public Customer(long id, String firstName, String lastName) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-        }
-
-        private long id;
-
-        private String firstName, lastName;
-
-        @Override
-        public String toString() {
-            return "Customer{" +
-                           "firstName='" + firstName + '\'' +
-                           ", lastName='" + lastName + '\'' +
-                           ", id=" + id +
-                           '}';
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public void setId(long id) {
-            this.id = id;
-        }
-
-    }
-
-    public static interface Crm {
-        Customer getCustomerById(long id);
-    }
-
-    public static class CrmImpl implements Crm {
-        public Customer getCustomerById(long id) {
-            return new Customer( id , "josh", "long");
+    @Configuration
+    public static class ClientConfiguration {
+        @Bean
+        public JbossRemotingProxyFactoryBean client() {
+            JbossRemotingProxyFactoryBean<Crm> bean = new JbossRemotingProxyFactoryBean<Crm>();
+            bean.setServiceInterface(Crm .class);
+            return bean;
         }
     }
 
@@ -80,10 +33,20 @@ public class TestJbossRemotingExporter {
         }
     }
 
-    public static void main (String args []) throws Throwable {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(ServerConfiguration.class);
-        Crm crn = annotationConfigApplicationContext.getBean( Crm.class);
+    public static void main(String args[]) throws Throwable {
+        AnnotationConfigApplicationContext client = null ,
+                                            server =  null ;
+        try {
+        server = new AnnotationConfigApplicationContext(ServerConfiguration.class);
+        client = new AnnotationConfigApplicationContext(ClientConfiguration.class);
+        Crm crn = client.getBean(Crm.class);
         System.out.println(crn.getCustomerById(2423));
+        } finally {
+            if(null !=client)
+                client.stop();
+            if(null !=server)
+            server.stop();
+        }
     }
 
 
