@@ -74,8 +74,8 @@ public class TestMessagePackServiceExporter {
         }
 
         @Bean
-        public MessagePackServiceExporter helloService() throws Exception {
-            MessagePackServiceExporter exporter = new MessagePackServiceExporter();
+        public MessagePackExporter helloService() throws Exception {
+            MessagePackExporter exporter = new MessagePackExporter();
             exporter.setHost(HOST);
             exporter.setPort(PORT);
             exporter.setService(service());

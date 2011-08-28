@@ -44,9 +44,7 @@ public class AvroExporter extends AbstractAvroExporter implements InitializingBe
     private Server server;
     protected InetSocketAddress inetSocketAddress;
     private ServerCreationCallback serverCreationCallback;
-
     protected int port = 2003;
-
 
     public void setServerCreationCallback(ServerCreationCallback serverCreationCallback) {
         this.serverCreationCallback = serverCreationCallback;
@@ -82,19 +80,15 @@ public class AvroExporter extends AbstractAvroExporter implements InitializingBe
         }
     }
 
-
     @Override
     public boolean isAutoStartup() {
         return true;
     }
 
-
     @Override
     public void stop() {
-        // shut it down
         this.running = false;
     }
-
 
     @Override
     public void stop(Runnable callback) {

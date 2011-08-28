@@ -253,7 +253,7 @@ public final class Crm {
                                           com.google.protobuf.GeneratedMessage.Builder<Builder> {
             private org.springframework.obm.protocolbuffers.crm.Crm.Customer result;
 
-            // Construct using org.springframework.obm.protocolbuffers.crm.Crm.Customer.newBuilder()
+            // Construct using org.springframework.obm.protocolbuffers.crm.CrmImpl.Customer.newBuilder()
             private Builder() {
             }
 

@@ -7,6 +7,16 @@
     <version>1.0.0-BUILD-SNAPSHOT</version>
 
     <properties>
+        <!-- remove me -->
+        <xnio.version>3.0.0.Beta2</xnio.version>
+        <logging.version>3.0.0.Beta5</logging.version>
+        <logging-tools.version>1.0.0.Beta6</logging-tools.version>
+
+
+        <version.org.jboss.remoting3.jboss-remoting>3.2.0.Beta2</version.org.jboss.remoting3.jboss-remoting>
+
+        <!-- remove me -->
+
         <java-version>1.6</java-version>
         <org.springframework-version>3.1.0.M2</org.springframework-version>
         <org.aspectj-version>1.6.9</org.aspectj-version>
@@ -14,6 +24,18 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.5.8</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.5.8</version>
+                <optional>true</optional>
+            </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
@@ -186,14 +208,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.8</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -212,11 +230,9 @@
             <groupId>junit</groupId>
             <artifactId>junit-dep</artifactId>
         </dependency>
-
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -229,11 +245,144 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-
         </dependency>
+        <!-- <dependency>
+            <groupId>org.jboss.remoting3</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>3.2.0.Beta2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>${logging-tools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-api</artifactId>
+            <version>${xnio.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-jmx</artifactId>
+            <version>4.2.3.GA</version>
+        </dependency>
+        <dependency>
+            <groupId>oswego-concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>1.3.4-jboss-update1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>${logging-tools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+           <dependency><groupId>org.jboss</groupId><artifactId>jboss-common-core</artifactId><version>2.2.17.GA</version></dependency>
+        <!--<dependency>
+            <version>6.0.0.Final</version>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-jbossas-remoting</artifactId>
+        </dependency>-->
+
+        <!-- <dependency>
+            <groupId>org.jboss.remoting</groupId><artifactId>jboss-remoting-socket</artifactId><version>2.5.3</version>
+        </dependency>-->
+        <!--<dependency>
+            <version>6.0.0.Final</version>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-jbossas-remoting</artifactId>
+        </dependency>-->
+        <!--  <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-parent</artifactId>
+          <version>7.0.0.Final</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>-->    <!--  <dependency>
+            <version>6.0.0.Final</version>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-jbossas-remoting</artifactId>
+        </dependency>-->
+        <!--
+
+            <dependency>
+              <groupId>org.jboss.as</groupId>
+              <artifactId>jboss-as-parent</artifactId>
+              <version>7.0.0.Final</version>
+              <type>pom</type>
+              <scope>import</scope>
+            </dependency>
+        -->
+
+        <!-- <dependency>
+            <version>6.0.0.Final</version>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-jbossas-remoting</artifactId>
+        </dependency>-->
+        <!--  <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting-socket</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>2.5.2</version>
+        </dependency>-->
+        <!--    <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting-socket</artifactId>
+           <version>2.5.3</version>
+        </dependency>-->
+        <!--  <dependency>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting-core</artifactId>
+            &lt;!&ndash;<version>2.5.0.SP2</version>&ndash;&gt;
+            <version>2.5.3</version>
+        </dependency>-->
+        <!--    <dependency>
+                    <groupId>org.jboss.remoting</groupId>
+                    <artifactId>jboss-remoting-serialization</artifactId>
+                    <version>2.5.0.SP2</version>
+                </dependency>
+        -->
     </dependencies>
     <repositories>
-        <!-- For developing against latest Spring milestones -->
+        <!--<repository>
+            <id>atlassian</id>
+            <url>http://maven.atlassian.com/content/repositories/jboss-releases</url>
+        </repository>
+        <repository>
+            <id>jbr</id>
+            <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
+        <repository>
+            <id>jbr-deprecated</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/deprecated</url>
+        </repository>-->
+
+        <repository>
+            <id>oldjbr</id>
+            <url>http://repository.jboss.org/</url>
+        </repository>
+        <repository>
+            <id>jbr1</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
         <repository>
             <id>org.springframework.maven.milestone</id>
             <name>Spring Maven Milestone Repository</name>
@@ -242,7 +391,13 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!--     <repository>
+            <id>jboss-maven2-release-repository</id>
+            <url>https://oss.sonatype.org/content/repositories/JBoss</url>
+        </repository>-->
+
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>dtrott</id>
