@@ -281,6 +281,10 @@
          <!-- JBoss Remoting! -->
     </dependencies>
     <repositories>
+		<repository> 
+				<url>http://msgpack.org/maven2/</url>
+				<id>msgpack</id>
+		</repository>
         <repository>
             <!-- the 'old' jboss maven repository-->
             <id>jbr0</id>
